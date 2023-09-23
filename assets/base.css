@@ -1,0 +1,107 @@
+html, p, Pre, Div, H1, h2, h3 {
+    font-family: "Calibri";
+}
+
+Pre{
+    white-space: pre-wrap; 
+}
+
+h2{
+    font-size: 22px;
+    text-decoration: none;
+}
+
+h3{
+    font-size:18px;
+    text-transform: uppercase;
+}
+
+textarea, p, Pre{
+    font-size: 16px;
+}
+
+.tab{
+    height: 50px !important;
+    padding: 10px !important;
+}
+
+.btn {
+    font-size: 18px;
+    word-wrap: break-word;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+textarea {
+    font-size: 18px;
+    word-wrap: break-word;
+}
+
+.dash-dropdown,.dash-table-container{
+    font-size: 18px;
+}
+
+.card-header{
+    font-size: 22px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.big-button-a{
+    text-decoration: none;
+    height: 100%;
+    width: 100%;
+}
+
+.big-button-div{
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;        
+    border-radius: 10px;
+    background-color: rgba(50,50,50,0.1);
+    color: black;
+    min-height: 250px;
+}
+
+.big-button-div>*{
+    text-align: center;
+    padding: 5px;
+}
+
+.big-button-div:hover{
+    background-color: rgba(50,50,50,0.25);
+}
+
+.app-title{
+    color: #00c896
+}
+
+@media screen and (max-width: 850px) {
+
+
+    h2{
+        font-size: 20px;
+    }
+    
+    h3 {
+        font-size: 18px;
+    } 
+    
+    .btn {
+        font-size: 16px;
+    }
+    
+    .dash-dropdown, .dash-table-container{
+        font-size: 16px;
+    }
+
+    textarea, p, Pre{
+        font-size: 14px;
+    }
+
+}

@@ -16,7 +16,7 @@ def getEmptyPlot():
             },
             "annotations": [
                 {
-                    "text": "No data available",
+                    "text": "Brak danych",
                     "xref": "paper",
                     "yref": "paper",
                     "showarrow": False,
@@ -38,8 +38,10 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
             y = aYArray,
             line_color=sColour,
             mode='lines',
-            hovertemplate = None,
-            opacity=0.75
+            showlegend=False,
+            hoverinfo='text',
+            hovertemplate="Średnica: %{y:.3f}<extra></extra>",
+            opacity=0.75,
         )
     )
 

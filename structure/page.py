@@ -2,20 +2,24 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 from structure.plotter import getEmptyPlot
 
+BASE_COLOR = '#008ede'
+
 def serveNavbar():
     navbar = dbc.Navbar([
         html.Div([
             html.Div(
                 [
-                    html.A(html.Img(src=r"assets\logo.png", height="50px", style={"padding": "5px"}), href=r'https://pwrinspace.pwr.edu.pl/'),
+                    html.A(html.Img(src=r"assets\logo_pwr.png", height="50px"), href=r'https://pwr.edu.pl/', className='logo-navbar'),
+                    html.A(html.Img(src=r"assets\logo2.png", height="50px"), href=r'https://pwrinspace.pwr.edu.pl/', className='logo-navbar'),
                 ], style={
                         "display": "flex",
                         "justify-content": "left",
                         "align-items": "center",
-                        "margin-left": "10px"
+                        "margin-left": "10px",
+                        "gap": "5px",
                     }
                 ),
-            html.H1("ParaSim", className="app-title"),
+            html.H1("ParaSim", style={"color": BASE_COLOR}),
 
 
         ], style={
@@ -27,13 +31,30 @@ def serveNavbar():
                 "align-items": "center"
             }
         )
-    ], style={
-            "background-color": "white",
-            "width": "100%",
-            "height": "75px",
-            "box-shadow": "0px 0px 15px rgba(50,50,50,0.25)",
-        },
-        sticky='top'
+    ], 
+    className= 'card-footer',
+    style={'height': '75px'},
+    sticky='top'
+    )
+    return navbar
+
+def serveFooter():
+    navbar = html.Footer([
+        html.Div([
+            html.P("Dział odzysku i systemów spadochronowych", className='footer-text'),
+            html.P("2023", className='footer-text'),
+        ], style={
+                "display": "flex",
+                "flex-direction": "column",
+                "width": "100%",
+                "height": "100%",
+                "justify-content": "space-around",
+                "align-items": "center"
+            }
+        )
+    ], 
+    className= 'card-footer',
+    style={'height': '50px'}
     )
     return navbar
 
@@ -43,29 +64,29 @@ def serveBody():
                 html.H2(
                     "Wymagana średnica czaszy spadochronu",
                     style = {
-                        "background-color": "rgba(50,50,50,0.1)",
-                        "padding": "10px",
-                        "border-radius": "10px",
-                        "width": "100%",
                         'grid-row': '1',
                         'grid-column': '1/-1',
-                    }),
+                    },
+                    className='h2-box'
+                ),
                 dbc.Card([
-                    dbc.CardHeader("Parametry wejściowe"), 
+                    dbc.CardHeader(html.H3("Parametry wejściowe")), 
                     dbc.CardBody([
                         html.Div(
                         [
                             "Masa pojazdu [kg]:",
                             dcc.Input(type='number', id='simulation1-mass-input', min=0, step=.1, value=5.0),
-                            "Zakres prędkości opadania: min [m/s]:",
+                            "Zakres prędkości docelowej - min [m/s]:",
                             dcc.Input(type='number', id='simulation1-velocitystart-input', min=0, step=.5, value=5.0),
-                            "Zakres prędkości opadania: max [m/s]:",
+                            "Zakres prędkości docelowej - max [m/s]:",
                             dcc.Input(type='number', id='simulation1-velocitystop-input', min=0, step=.5, value=25.0),
-                            "Oczekiwana prędkość opadania [m/s]:",
-                            dcc.Input(type='number', id='simulation1-velocity-input', min=0, step=1, value=10.0),
+                            "Oczekiwana prędkość [m/s]:",
+                            dcc.Input(type='number', id='simulation1-velocity-input', min=0, step=.1, value=10.0),
+                            "Wyznaczona średnica czaszy [m]:",
+                            dcc.Input(type='number', id='simulation1-diameter-input', value=0.0, disabled=True),
                         ], style={
                             "display": "grid",
-                            "grid-template-columns": "auto 1fr",
+                            "grid-template-columns": "1fr 75px",
                             "width": "100%",
                             "gap": "5px",
                             "text-align": "right",
@@ -84,13 +105,13 @@ def serveBody():
                     style = {
                         'width': '100%',
                         'margin': '5px',
-                        'background-color': '#00c896',
+                        'background-color': BASE_COLOR,
                         'color': 'white',
-                        'border-color': '#00c896'
+                        'border-color': BASE_COLOR
                     }
                 ), 
                 dbc.Card([
-                    dbc.CardHeader("Wyniki"), 
+                    dbc.CardHeader(html.H3("Wyniki")), 
                     dbc.CardBody([
                         html.Div(
                             [
@@ -115,48 +136,27 @@ def serveBody():
                 html.H2(
                     "Obciążenia przy otwarciu spadochronu",
                     style = {
-                        "background-color": "rgba(50,50,50,0.1)",
-                        "padding": "10px",
-                        "border-radius": "10px",
-                        "width": "100%",
                         'grid-row': '4',
                         'grid-column': '1/-1',
-                    }),
+                    },
+                    className='h2-box'
+                ),
                 dbc.Card([
-                    dbc.CardHeader("Parametry wejściowe"), 
+                    dbc.CardHeader(
+                        html.H3("Parametry wejściowe"),
+                    ), 
                     dbc.CardBody([
                         html.Div(
                         [
                             "Masa pojazdu [kg]:",
                             dcc.Input(type='number', id='simulation2-mass-input', min=0, step=.1, value=5.0),
-                            html.Div([]), 
-                            "Oczekiwana prędkość opadania [m/s]:",
-                            dcc.Input(type='number', id='simulation2-velocity-input', min=0, step=.1, value=10.0),
-                            dcc.Checklist(
-                                id = 'simulation2-velocity-checkmark',
-                                options = [{'label':'', 'value':'use'}],
-                                value = ['use'],
-                                persistence = True,
-                                persistence_type = 'session',
-                                style={
-                                    "width": "auto",
-                                }
-                            ),
+                            "Prędkość przy otwarciu [m/s]:",
+                            dcc.Input(type='number', id='simulation2-velocity-input', min=0, step=.1, value=40.0),
                             "Średnica spadochronu [m]:",
-                            dcc.Input(type='number', id='simulation2-diameter-input', min=0, step=.05, value=0.30),
-                            dcc.Checklist(
-                                id = 'simulation2-diameter-checkmark',
-                                options = [{'label':'', 'value':'use'}],
-                                value = [],
-                                persistence = True,
-                                persistence_type = 'session',
-                                style={
-                                    "width": "auto",
-                                }
-                            ),
+                            dcc.Input(type='number', id='simulation2-diameter-input', min=0, step=.01, value=0.30),
                         ], style={
                             "display": "grid",
-                            "grid-template-columns": "auto 1fr auto",
+                            "grid-template-columns": "1fr 75px",
                             "width": "100%",
                             "gap": "5px",
                             "text-align": "right",
@@ -175,13 +175,13 @@ def serveBody():
                     style = {
                         'width': '100%',
                         'margin': '5px',
-                        'background-color': '#00c896',
+                        'background-color': BASE_COLOR,
                         'color': 'white',
-                        'border-color': '#00c896'
+                        'border-color': BASE_COLOR
                     }
                 ), 
                 dbc.Card([
-                    dbc.CardHeader("Wyniki"), 
+                    dbc.CardHeader(html.H3("Wyniki")), 
                     dbc.CardBody([
                         html.Div(
                             id = "simulation2-numericdata-container",
@@ -201,11 +201,11 @@ def serveBody():
             ],
             style = {
                 "display": "grid",
-                "grid-template-columns": "600px 1fr",
+                "grid-template-columns": "minmax(400px, 1fr) 3fr",
                 "grid-template-rows": "auto 1fr auto auto 1fr auto",
                 "gap": "10px",
                 "align-items": "stretch",
                 "justify-content": "space-between",   
-                "width": "100%",    
+                "width": "100%",
             }
         )

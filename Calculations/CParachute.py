@@ -2,16 +2,16 @@
 Parachute class definition
 """
 
-from Calculations.ConstantParameters import *
+from calculations.ConstantParameters import *
 import numpy as np
 #import matplotlib.pyplot as plt
 #import os, time
 
-def getDiamaterFromVelocity(_Velocity: np.ndarray | float, fMass: float):
+def getDiamaterFromVelocity(_TargetVelocity: np.ndarray | float, fMass: float):
     """
     Get required parachute area for given target velocity
     """
-    return 2*np.sqrt((2*fMass*G_ACCELERATION/(AIR_DENSITY*_Velocity**2*DRAG_COEFF))/np.pi)
+    return 2*np.sqrt((2*fMass*G_ACCELERATION/(AIR_DENSITY*_TargetVelocity**2*DRAG_COEFF))/np.pi)
     
 def getVelocityFromDiameter(_Diameter: np.ndarray | float, fMass: float):
     """
@@ -22,29 +22,22 @@ def getVelocityFromDiameter(_Diameter: np.ndarray | float, fMass: float):
 
 def calculateDiameterVelocityRelationship(
         fMass: float,
-        tVelocityRange: tuple | list = (5, 20),
+        tTargetVelocityRange: tuple | list = (5, 20),
         iSamples: int = 50
     ):
-    aVelocity = np.linspace(tVelocityRange[0],tVelocityRange[1],iSamples)
-    aDiameters = getDiamaterFromVelocity(aVelocity, fMass)
-    return aVelocity, aDiameters
+    aTargetVelocity = np.linspace(tTargetVelocityRange[0],tTargetVelocityRange[1],iSamples)
+    aDiameters = getDiamaterFromVelocity(aTargetVelocity, fMass)
+    return aTargetVelocity, aDiameters
 
 class CParachute():
 
     def __init__(
             self,
             fMass: float,
-            fCanopyDiameter: float | None = None,
-            fOpenInitVelocity: float | None = None,            
+            fCanopyDiameter: float,
+            fOpenInitVelocity: float,            
         ):
-                
-        if fCanopyDiameter is None and fOpenInitVelocity is None:
-            raise Exception("Not enough parameters passed!")
-        elif fCanopyDiameter is None:
-            fCanopyDiameter = getDiamaterFromVelocity(fOpenInitVelocity, fMass)  
-        elif fOpenInitVelocity is None:
-            fOpenInitVelocity = getVelocityFromDiameter(fCanopyDiameter, fMass)   
-        
+      
         # Mass
         self.fMass = fMass
         # Canopy parameters

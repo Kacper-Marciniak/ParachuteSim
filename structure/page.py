@@ -1,6 +1,7 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from structure.plotter import getEmptyPlot
+from calculations.ConstantParameters import *
 
 BASE_COLOR = '#008ede'
 
@@ -58,7 +59,122 @@ def serveFooter():
     )
     return navbar
 
-def serveBody():
+def serveInputData():
+    return html.Div(
+            [                
+                html.H2(
+                    "Podstawowe parametry symulacji",
+                    style = {
+                        'grid-row': '1',
+                        'grid-column': '1/-1',
+                    },
+                    className='h2-box'
+                ),
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.H3("Wyznaczenie gęstości powietrza"),
+                        
+                    ), 
+                    dbc.CardBody([
+                        html.Div(
+                        [
+                            "Ciśnienie odniesienia [hPa]:",
+                            dcc.Input(type='number', id='input-refpressure-input', min=0, step=1, value=1013),
+                            "Temperatura odniesienia [C]:",
+                            dcc.Input(type='number', id='input-reftemp-input', min=0, step=.1, value=20.0),
+                            "Wilgotność powietrza [%]:",
+                            dcc.Input(type='number', id='input-humidity-input', min=0, step=1, max = 100, value=40),
+                            "Relatywna wysokość otworzenia spadochronu [m]:",
+                            dcc.Input(type='number', id='input-height-input', min=0, step=1, max=10000, value=1000),
+                            "Wyznaczona gęstość powietrza [kg/m^3]:",
+                            dcc.Input(type='number', id='input-airdensitycalc-input', min=0, step=1, value=0.0, disabled=True),
+                        ], style={
+                            "display": "grid",
+                            "grid-template-columns": "1fr 75px",
+                            "width": "100%",
+                            "gap": "5px",
+                            "text-align": "right",
+                            "padding": "5px"
+                        }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '2',
+                    'grid-column': '1',
+                    'height': '100%'
+                }),
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.H3("Parametry fizyczne"),
+                    ), 
+                    dbc.CardBody([
+                        html.Div(
+                        [
+                            "Gęstość powietrza [kg/m^3]:",
+                            dcc.Input(type='number', id='input-airdensity-input', min=0, step=.001, value=INPUT_PARAMETERS["AIR_DENSITY"]),
+                            "Przyśpieszenie ziemskie [m/s^2]:",
+                            dcc.Input(type='number', id='input-gaccel-input', min=0, step=.001, value=INPUT_PARAMETERS["G_ACCELERATION"]),
+                            "Współczynnik oporu aerodynamicznego [-]:",
+                            dcc.Input(type='number', id='input-dragcoeff-input', min=0, step=.001, value=INPUT_PARAMETERS["DRAG_COEFF"]),
+                            "Całka oporu aerodynamicznego [-]:",
+                            dcc.Input(type='number', id='input-draginteg-input', min=0, step=.001, value=INPUT_PARAMETERS["DRAG_INTEGRAL"]),
+                            "Współczynnik wstrząsu przy otwarciu [-]:",
+                            dcc.Input(type='number', id='input-schockfactor-input', min=0, step=.001, value=INPUT_PARAMETERS["OPENING_LOAD_SHOCK_FACTOR"]),
+                            "Współczynnik redukcji siły przy otwarciu [-]:",
+                            dcc.Input(type='number', id='input-forcereduction-input', min=0, step=.001, value=INPUT_PARAMETERS["OPENING_FORCE_REDUCTION_FACTOR"]),
+                            "Stała napełniania czaszy [-]:",
+                            dcc.Input(type='number', id='input-fillconst-input', min=0, step=.001, value=INPUT_PARAMETERS["INFLATION_CANOPY_FILL_CONST"]),
+                            "Wykładnik opóźnienia [-]:",
+                            dcc.Input(type='number', id='input-deccel-input', min=0, step=.001, value=INPUT_PARAMETERS["DECCELERATION_EXPONENT"]),
+                        ], style={
+                            "display": "grid",
+                            "grid-template-columns": "1fr 75px",
+                            "width": "100%",
+                            "gap": "5px",
+                            "text-align": "right",
+                            "padding": "5px"
+                        }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '2/-1',
+                    'grid-column': '2',
+                    'height': '100%'
+                }),
+                dbc.Button(
+                    "Przelicz",
+                    id="input-run-button",
+                    style = {
+                        'width': '100%',
+                        'margin': '5px',
+                        'background-color': BASE_COLOR,
+                        'color': 'white',
+                        'border-color': BASE_COLOR
+                    }
+                ), 
+                dbc.Card([
+                    dbc.CardHeader(html.H3("Opis parametrów")), 
+                    dbc.CardBody([
+                        html.Div(
+                            id = "input-description-container",
+                            style={
+                                
+                                "width": "100%",
+                                "padding": "5px",
+                                "gap": "5px"
+                            }                    
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '2/-1',
+                    'grid-column': '3',
+                    'height': '100%'
+                }),
+            ],
+            className='input-container'
+        )
+
+def serveSim1():
     return html.Div(
             [                
                 html.H2(
@@ -132,11 +248,18 @@ def serveBody():
                     'grid-row': '2/4',
                     'grid-column': '2',
                     'height': '100%'
-                }),               
+                }),
+            ],
+            className='sim-container'
+        )
+
+def serveSim2():
+    return html.Div(
+            [                
                 html.H2(
                     "Obciążenia przy otwarciu spadochronu",
                     style = {
-                        'grid-row': '4',
+                        'grid-row': '1',
                         'grid-column': '1/-1',
                     },
                     className='h2-box'
@@ -165,7 +288,7 @@ def serveBody():
                         )
                     ]),
                 ], style={
-                    'grid-row': '5',
+                    'grid-row': '2',
                     'grid-column': '1',
                     'height': '100%'
                 }),
@@ -194,18 +317,10 @@ def serveBody():
                         )
                     ]),
                 ], style={
-                    'grid-row': '5/-1',
+                    'grid-row': '2/-1',
                     'grid-column': '2',
                     'height': '100%'
                 }),
             ],
-            style = {
-                "display": "grid",
-                "grid-template-columns": "minmax(400px, 1fr) 3fr",
-                "grid-template-rows": "auto 1fr auto auto 1fr auto",
-                "gap": "10px",
-                "align-items": "stretch",
-                "justify-content": "space-between",   
-                "width": "100%",
-            }
+            className='sim-container'
         )

@@ -101,6 +101,26 @@ textarea {
     border-radius: 10px !important;
 }
 
+.sim-container {
+    display: grid;
+    grid-template-columns: minmax(400px, 1fr) 3fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 10px;
+    align-items: stretch;
+    justify-content: space-between;  
+    width: 100%;
+}
+
+.input-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 10px;
+    align-items: stretch;
+    justify-content: space-between;  
+    width: 100%;
+}
+
 @media screen and (max-width: 850px) {
 
 }

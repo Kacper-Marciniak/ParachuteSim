@@ -40,7 +40,7 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
             mode='lines',
             showlegend=False,
             hoverinfo='text',
-            hovertemplate="Średnica: %{y:.3f}<extra></extra>",
+            hovertemplate="Średnica: %{y:.3f} m<extra></extra>",
             opacity=0.75,
         )
     )

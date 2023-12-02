@@ -2,10 +2,8 @@
 Parachute class definition
 """
 
-from calculations.ConstantParameters import *
+from Calculations.ConstantParameters import *
 import numpy as np
-#import matplotlib.pyplot as plt
-#import os, time
 
 def getDiamaterFromVelocity(_TargetVelocity: np.ndarray | float, fMass: float, dcParameters: dict = INPUT_PARAMETERS):
     """

@@ -8,9 +8,9 @@ import datetime
 
 from structure.page import serveSim1, serveSim2, serveNavbar, serveFooter, serveInputData
 from structure.plotter import plotResults, getEmptyPlot
-from calculations.CParachute import CParachute, calculateDiameterVelocityRelationship
-from calculations.Air import getAirDensity
-from calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET
+from Calculations.CParachute import CParachute, calculateDiameterVelocityRelationship
+from Calculations.Air import getAirDensity
+from Calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET
 
 import numpy as np
 

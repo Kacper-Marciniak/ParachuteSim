@@ -1,6 +1,6 @@
 import numpy as np
 
-from calculations.ConstantParameters import *
+from Calculations.ConstantParameters import *
 
 def calculateHumidity(fRefHumidity: float, fHeightChange: float):
     return min(1.0,max(0.0, fRefHumidity+0.05*fHeightChange/1000.0))

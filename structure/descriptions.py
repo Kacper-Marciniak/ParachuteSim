@@ -9,10 +9,10 @@ Współczynnik oporu aerodynamicznego - wartość zależna od geometrii spadochr
 
 WYZNACZANIE GĘSTOŚCI POWIETRZA (PARAMETRY POŚREDNIE)
 
-Ciśnienie odniesienia - wartość ciśnienia atmosferycznego mierzona na platformie startowej
-Temperatura odniesienia - wartość temperatury powietrza mierzona na platformie startowej
-Wilgotność powietrza - mierzona na platformie startowej",
-Relatywna wysokość otworzenia spadochronu - wysokość (w metrach) otwarcia spadochronu (względem platformy startowej)"""
+Ciśnienie odniesienia - wartość ciśnienia atmosferycznego mierzona na platformie startowej.
+Temperatura odniesienia - wartość temperatury powietrza mierzona na platformie startowej.
+Wilgotność powietrza - mierzona na platformie startowej.
+Wysokość otworzenia spadochronu - wysokość (w metrach) otwarcia spadochronu (względem platformy startowej)."""
 
 DESCRIPTION_AIR_DENSITY_PARAMS = {
     "refpressure": "Ciśnienie atmosferyczne mierzone na platformie startowej",

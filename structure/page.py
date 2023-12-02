@@ -2,9 +2,9 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 from structure.plotter import getEmptyPlot
 from structure.descriptions import *
-from calculations.ConstantParameters import *
+from Calculations.ConstantParameters import *
 
-APP_VERSION = '1.1'
+APP_VERSION = '1.1-beta'
 APP_YEAR = '2023'
 BASE_COLOR = '#008ede'
 
@@ -25,16 +25,30 @@ def serveNavbar():
                 [
                     html.A(html.Img(src=r"assets\logo_pwr.png", height="50px"), href=r'https://pwr.edu.pl/', className='logo-navbar'),
                     html.A(html.Img(src=r"assets\logo2.png", height="50px"), href=r'https://pwrinspace.pwr.edu.pl/', className='logo-navbar'),
-                ], style={
-                        "display": "flex",
-                        "justify-content": "left",
-                        "align-items": "center",
-                        "margin-left": "10px",
-                        "gap": "5px",
-                    }
-                ),
+                ], 
+                style={
+                    "display": "flex",
+                    "flex-direction": "row",
+                    "justify-content": "start",
+                    "align-items": "center",
+                    "gap": "5px",
+                    "width": "100%"
+                }
+            ),
             html.H1("ParaSim", style={"color": BASE_COLOR}),
-
+            html.Div(
+                [
+                    html.A(html.Img(src=r"assets\logo_github.png", height="50px"), href=r'https://github.com/Kacper-Marciniak', className='logo-navbar'),
+                ], 
+                style={
+                    "display": "flex",
+                    "flex-direction": "row",
+                    "justify-content": "end",
+                    "align-items": "center",
+                    "gap": "5px",
+                    "width": "100%"
+                }
+            ),
 
         ], style={
                 "display": "grid",
@@ -42,7 +56,8 @@ def serveNavbar():
                 "width": "100%",
                 "height": "100%",
                 "justify-content": "space-between",
-                "align-items": "center"
+                "align-items": "center",
+                "padding": "0 10px 0 10px"
             }
         )
     ], 
@@ -55,7 +70,7 @@ def serveNavbar():
 def serveFooter():
     navbar = html.Footer([
         html.Div([
-            html.P(f"ParaSim v.{APP_VERSION} by Kacper Marciniak", className='footer-text'),
+            html.P(f"ParaSim v.{APP_VERSION}", className='footer-text'),
             html.P(APP_YEAR, className='footer-text'),
         ], style={
                 "display": "flex",
@@ -116,7 +131,7 @@ def serveInputData():
                             "Wilgotność powietrza [%]:",
                             dcc.Input(type='number', id='input-humidity-input', min=0, step=1, max = 100, value=40),
                             serveTooltip(DESCRIPTION_AIR_DENSITY_PARAMS['humidity'], 'input-humidity-input'),
-                            "Relatywna wysokość otworzenia spadochronu [m]:",
+                            "Wysokość otworzenia spadochronu [m]:",
                             dcc.Input(type='number', id='input-height-input', min=0, step=1, max=10000, value=1000),
                             serveTooltip(DESCRIPTION_AIR_DENSITY_PARAMS['height'], 'input-height-input'),
                             "Wyznaczona gęstość powietrza [kg/m^3]:",
@@ -192,7 +207,7 @@ def serveInputData():
                             }
                         ),
                         dbc.Button(
-                            "Zapisz",
+                            "💾 Zapisz",
                             id="input-save-button",
                             style = {
                                 'width': '100%',
@@ -303,7 +318,7 @@ def serveSim1():
                             }
                         ),
                         dbc.Button(
-                            "Zapisz",
+                            "💾 Zapisz",
                             id="simulation1-save-button",
                             style = {
                                 'width': '100%',
@@ -417,7 +432,7 @@ def serveSim2():
                             }
                         ),
                         dbc.Button(
-                            "Zapisz",
+                            "💾 Zapisz",
                             id="simulation2-save-button",
                             style = {
                                 'width': '100%',

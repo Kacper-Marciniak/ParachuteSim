@@ -48,16 +48,18 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
     for fY,sColor in lHorizontalLines:
         dcFigure.add_hline(
             fY,
-            line_color = sColor, 
+            line_color = sColor,
+            line_dash = "dash",
             opacity = .75, 
             line_width = 2, 
-            layer = 'below'
+            layer = 'below',
         )
 
     for fX,sColor in lVerticalLines:
         dcFigure.add_vline(
             fX,
             line_color = sColor, 
+            line_dash = "dash",
             opacity = .75, 
             line_width = 2, 
             layer = 'below'

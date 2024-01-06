@@ -1,3 +1,5 @@
+<div style="display: flex; justify-content: center; width: 100%; margin-bottom: 15px"><img src="assets/header.png" style="max-width: 1000px"></div>
+
 # PWrInSpace - parachute simulator
 
 Simple software to determine parachute parameters for the sounding rocket design process.

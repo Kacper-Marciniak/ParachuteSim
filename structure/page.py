@@ -4,8 +4,8 @@ from structure.plotter import getEmptyPlot
 from structure.descriptions import *
 from Calculations.ConstantParameters import *
 
-APP_VERSION = '1.1-beta'
-APP_YEAR = '2023'
+APP_VERSION = '1.1'
+APP_YEAR = '2024'
 BASE_COLOR = '#008ede'
 
 def serveTooltip(sMessage: str, sTarget: str, sPlacement: str='top'):
@@ -35,7 +35,20 @@ def serveNavbar():
                     "width": "100%"
                 }
             ),
-            html.H1("ParaSim", style={"color": BASE_COLOR}),
+            html.Div(
+                [
+                    html.H1("ParaSim", style={"color": BASE_COLOR}),
+                    html.Img(src=r"assets\app_shadow.png", height="50px"),
+                ], 
+                style={
+                    "display": "flex",
+                    "flex-direction": "row",
+                    "justify-content": "center",
+                    "align-items": "center",
+                    "gap": "5px",
+                    "width": "100%"
+                }
+            ),
             html.Div(
                 [
                     html.A(html.Img(src=r"assets\logo_github.png", height="50px"), href=r'https://github.com/Kacper-Marciniak', className='logo-navbar'),

@@ -41,7 +41,7 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
             showlegend=False,
             hoverinfo='text',
             hovertemplate="Średnica: %{y:.3f} m<extra></extra>",
-            opacity=0.75,
+            opacity=0.90,
         )
     )
 
@@ -50,7 +50,7 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
             fY,
             line_color = sColor,
             line_dash = "dash",
-            opacity = .75, 
+            opacity = 0.90, 
             line_width = 2, 
             layer = 'below',
         )
@@ -60,13 +60,31 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
             fX,
             line_color = sColor, 
             line_dash = "dash",
-            opacity = .75, 
+            opacity = 0.90, 
             line_width = 2, 
             layer = 'below'
         )
 
-    dcYaxis = dict(title_text = sYLabel, showticklabels=True, tickfont=dict(size=12))
-    dcXaxis = dict(title_text = sXlabel, showticklabels=True, tickfont=dict(size=12))
+    dcYaxis = dict(
+        title_text = sYLabel,
+        showticklabels=True,
+        tickfont=dict(size=12),
+        mirror=True,
+        ticks='outside',
+        showline=True,
+        linecolor='black',
+        gridcolor='lightgrey'
+    )
+    dcXaxis = dict(
+        title_text = sXlabel,
+        showticklabels=True,
+        tickfont=dict(size=12),
+        mirror=True,
+        ticks='outside',
+        showline=True,
+        linecolor='black',
+        gridcolor='lightgrey'
+    )
     dcMargin = dict(l = 15, r = 5, t = 0, b = 0)
 
     dcFigure.update_layout(
@@ -78,6 +96,7 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
         margin = dcMargin,
         showlegend = False,
         hovermode = "x unified",
+        plot_bgcolor='white',
     )
 
     return {'data': dcFigure['data'],'layout': dcFigure['layout']}

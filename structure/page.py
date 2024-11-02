@@ -4,7 +4,7 @@ from structure.plotter import getEmptyPlot
 from structure.descriptions import *
 from Calculations.ConstantParameters import *
 
-APP_VERSION = '1.1'
+APP_VERSION = '1.2'
 APP_YEAR = '2024'
 BASE_COLOR = '#008ede'
 
@@ -302,6 +302,8 @@ def serveSim1():
                             "Wyznaczona średnica czaszy [m]:",
                             dcc.Input(type='number', id='simulation1-diameter-input', value=0.0, disabled=True),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['diameter'], 'simulation1-diameter-input'),
+                            "Język etykiet na wykresie:",
+                            dcc.RadioItems(['PL', 'EN'], 'EN',  id='simulation1-plotlang-radio', inline=True)
                         ], style={
                             "display": "grid",
                             "grid-template-columns": "1fr 75px",
@@ -352,7 +354,14 @@ def serveSim1():
                                 dcc.Graph(
                                     id = 'simulation1-results-plot',
                                     figure = getEmptyPlot(),
-                                    config = {'responsive': False, "displayModeBar": False},
+                                    config = {
+                                        'responsive': False,
+                                        'displayModeBar': True,
+                                        'toImageButtonOptions': {
+                                            'format': 'png',
+                                            'filename': 'parasim_plot',
+                                            },
+                                    },
                                     style={"width": "100%", "height": "100%"},
                                 ),
                             ], style={

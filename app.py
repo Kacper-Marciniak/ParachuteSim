@@ -82,7 +82,7 @@ def callback(fRefPressure: float, fRefTemp: float, fHeight: float, fHumidity: fl
             fHeight *= -1.0
             fHumidity /= 100.0
             fDensity = round(getAirDensity(fRefPressure, fRefTemp, fHeight, fHumidity, dcParameters = dcStore),3)
-            dcStyle = {"background-color": "rgba(75,225,25, 0.5)"}
+            dcStyle = {"background-color": "rgba(75,75,225, 0.5)"}
             dcData = {
                 "Referencyjne ciśnienie atmosferyczne [hPa]": round(fRefPressure,1),
                 "Referencyjna temperatura powietrza [C]": round(fRefTemp,1),
@@ -127,11 +127,13 @@ def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFacto
     State('simulation1-velocitystart-input', 'value'),
     State('simulation1-velocitystop-input', 'value'),
     State('input-parameters-store', 'data'),
+    State('simulation1-plotlang-radio', 'value'),
     Input('simulation1-run-button', 'n_clicks')
 )
-def callback(fMass: float, fVelocity: float, fVelocityStart: float, fVelocityStop: float, dcParameters: dict, _Button):
+def callback(fMass: float, fVelocity: float, fVelocityStart: float, fVelocityStop: float, dcParameters: dict, sLanguage: str, _Button):
     if _Button:
         try:
+            bIsPL = sLanguage=="PL"
             aVelocity, aDiameters = calculateDiameterVelocityRelationship(
                 fMass=fMass,
                 tTargetVelocityRange=(fVelocityStart, fVelocityStop),
@@ -151,7 +153,8 @@ def callback(fMass: float, fVelocity: float, fVelocityStart: float, fVelocitySto
             return plotResults(
                 aVelocity, aDiameters, 
                 sColour="black", 
-                sXlabel="Docelowa prędkość opadania [m/s]", sYLabel="Średnica czaszy [m]", 
+                sXlabel="Docelowa prędkość opadania [m/s]" if bIsPL else "Target descent velocity [m/s]", 
+                sYLabel="Średnica czaszy [m]" if bIsPL else "Canopy diameter [m]", 
                 lHorizontalLines=[(fDiameter,'crimson')], lVerticalLines=[(fVelocity,'crimson')]
             ), np.round(fDiameter,2), dcData
         except Exception as E:
@@ -231,6 +234,7 @@ def callback(fMass1: float, fMass2: float):
 @app.callback(
     Output('simulation2-diameter-input', 'value'),
     Output('simulation2-diameter-input', 'style'),
+    Output('simulation1-diameter-input', 'style'),
     Input('simulation1-diameter-input', 'value'),
     Input('simulation2-diameter-input', 'value')
 )
@@ -238,12 +242,12 @@ def callback(fDiameter: float, _Sim2Val):
     sTrigger = callback_context.triggered_id
     if sTrigger == 'simulation1-diameter-input':
         dcStyle = {"background-color": "rgba(75,225,25, 0.5)"} if fDiameter>0.0 else {"background-color": "white"}
-        return fDiameter, dcStyle
+        return fDiameter, dcStyle, dcStyle
     elif sTrigger == 'simulation2-diameter-input':
         dcStyle = {"background-color": "white"}
-        return no_update, dcStyle
+        return no_update, dcStyle, dcStyle
     else:
-        return no_update, no_update
+        return no_update, no_update, no_update
 
 
 @app.callback(
@@ -257,7 +261,7 @@ def callback(dcData: dict, _Button):
         try:
             sName = 'wyniki_gestosc_{}.csv'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
             pdData = pd.DataFrame().from_dict({key: [dcData[key]] for key in dcData})
-            return dcc.send_data_frame(pdData.to_csv, sName, sep = '\t', index = False, header=True, encoding='utf-8')
+            return dcc.send_data_frame(pdData.to_csv, sName, sep = ';', index = False, header=True, encoding='utf-8')
         except Exception as E: 
             print(E)  
     return no_update
@@ -273,7 +277,7 @@ def callback(dcData: dict, _Button):
         try:
             sName = 'wyniki_srednica_{}.csv'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
             pdData = pd.DataFrame().from_dict({key: [dcData[key]] for key in dcData})
-            return dcc.send_data_frame(pdData.to_csv, sName, sep = '\t', index = False, header=True, encoding='utf-8')
+            return dcc.send_data_frame(pdData.to_csv, sName, sep = ';', index = False, header=True, encoding='utf-8')
         except Exception as E: 
             print(E)  
     return no_update
@@ -289,7 +293,7 @@ def callback(dcData: dict, _Button):
         try:
             sName = 'wyniki_obciazenia_{}.csv'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
             pdData = pd.DataFrame().from_dict({key: [dcData[key]] for key in dcData})
-            return dcc.send_data_frame(pdData.to_csv, sName, sep = '\t', index = False, header=True, encoding='utf-8')
+            return dcc.send_data_frame(pdData.to_csv, sName, sep = ';', index = False, header=True, encoding='utf-8')
         except Exception as E: 
             print(E)  
     return no_update

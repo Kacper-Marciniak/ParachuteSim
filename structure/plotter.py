@@ -28,7 +28,7 @@ def getEmptyPlot():
         }
     }
 
-def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYLabel: str = "", sColour: str = "black", lHorizontalLines: list[tuple] = [], lVerticalLines: list[tuple] = []):
+def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYLabel: str = "", sColour: str = "black", lHorizontalLines: list[tuple] = [], lVerticalLines: list[tuple] = [], bEqualAxis: bool = False):
 
     dcFigure = go.Figure()
 
@@ -73,7 +73,8 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
         ticks='outside',
         showline=True,
         linecolor='black',
-        gridcolor='lightgrey'
+        gridcolor='lightgrey',
+        scaleanchor="x" if bEqualAxis else "y",
     )
     dcXaxis = dict(
         title_text = sXlabel,
@@ -96,6 +97,71 @@ def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYL
         margin = dcMargin,
         showlegend = False,
         hovermode = "x unified",
+        plot_bgcolor='white',
+    )
+
+    return {'data': dcFigure['data'],'layout': dcFigure['layout']}
+
+def plotShape(aXArray: np.ndarray, aYArray: np.ndarray, sColour: str = "black"):
+
+    dcFigure = go.Figure()
+
+    dcFigure.add_trace(
+        go.Scatter(
+            x = aXArray, 
+            y = aYArray,
+            line_color=sColour,
+            mode='lines',
+            showlegend=False,
+            hoverinfo='text',
+            hovertemplate="X:%{x:.3f} Y:%{y:.3f} m<extra></extra>",
+            opacity=0.90,
+        )
+    )
+
+    # Add text
+    dcFigure.add_trace(
+        go.Scatter(
+            x = [np.min(aXArray)], 
+            y = [np.max(aYArray)],
+            text = f"SX={np.max(aXArray)-np.min(aXArray):.3f}m; SY={np.max(aYArray)-np.min(aYArray):.3f}m",
+            mode = "text",
+            textfont=dict(size=16),
+            showlegend=False,
+            hoverinfo='none',
+            opacity=0.90,
+        )
+    )
+
+    dcYaxis = dict(
+        showticklabels=True,
+        tickfont=dict(size=12),
+        mirror=True,
+        ticks='outside',
+        showline=True,
+        linecolor='black',
+        gridcolor='lightgrey',
+        scaleanchor="x",
+    )
+    dcXaxis = dict(
+        showticklabels=True,
+        tickfont=dict(size=12),
+        mirror=True,
+        ticks='outside',
+        showline=True,
+        linecolor='black',
+        gridcolor='lightgrey'
+    )
+    dcMargin = dict(l = 15, r = 5, t = 0, b = 0)
+
+    dcFigure.update_layout(
+        transition_duration = 200, 
+        autosize = True,
+        template = "seaborn",
+        xaxis = dcXaxis,
+        yaxis = dcYaxis,
+        margin = dcMargin,
+        showlegend = False,
         plot_bgcolor='white',
     )
 

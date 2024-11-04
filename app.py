@@ -5,10 +5,15 @@ from dash.dependencies import Input, Output, State
 import webbrowser
 import pandas as pd
 import datetime
+import ezdxf
+from ezdxf import units
+import os
 
-from structure.page import serveSim1, serveSim2, serveNavbar, serveFooter, serveInputData
-from structure.plotter import plotResults, getEmptyPlot
+from structure.pageSimulation import serveSim1, serveSim2, serveInputData, serveShapeGenerator, serveModalDragCoeffInfo
+from structure.baseElements import serveNavbar, serveFooter
+from structure.plotter import plotResults, plotShape, getEmptyPlot
 from Calculations.CParachute import CParachute, calculateDiameterVelocityRelationship
+from Calculations.CShapeGenerator import CShapeGenerator
 from Calculations.Air import getAirDensity
 from Calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET
 
@@ -32,9 +37,11 @@ def _serve_layout():
         dcc.Store('input-parameters-store', storage_type='session', data=INPUT_PARAMETERS),
         dcc.Store('simulation1-results-store', storage_type='session', data={}),
         dcc.Store('simulation2-results-store', storage_type='session', data={}),
+        dcc.Store('shapegenerator-results-store', storage_type='session', data=[]),
         dcc.Download('airdensity-results-download'),
         dcc.Download('simulation1-results-download'),
-        dcc.Download('simulation2-results-download')
+        dcc.Download('simulation2-results-download'),
+        dcc.Download('shapegenerator-results-download')
     ])
 
 # Update displayed page
@@ -49,7 +56,9 @@ def display_page(sUrl: str | None):
             serveInputData(),
             serveSim1(),
             serveSim2(),
-            serveFooter(),            
+            serveShapeGenerator(),
+            serveFooter(),
+            serveModalDragCoeffInfo()
         ],
         className='page-content'
     )
@@ -209,6 +218,28 @@ Szczytowe obciążenie przy otwarciu:
     
     return "Brak danych", {}
     
+@app.callback(
+    Output('shapegenerator-results-plot', 'figure'),    
+    Output('shapegenerator-results-store', 'data'),
+    State('shapegenerator-diameter-input', 'value'),
+    State('shapegenerator-segments-input', 'value'),
+    State('shapegenerator-spherepercent-input', 'value'),
+    State('shapegenerator-points-input', 'value'),
+    Input('shapegenerator-run-button', 'n_clicks')
+)
+def callback(fDiameter: float, iSegments: int, fSpherePercent: float, iNPoints: int, _Button):
+    if _Button:
+        try:
+            cGenerator = CShapeGenerator(fSpherePercent, fDiameter, iSegments)
+            aContour = cGenerator.getSegmentShape(iNPoints)
+
+            return plotShape(
+                aContour[:,1], aContour[:,0], 
+                sColour="black"
+            ), aContour.tolist()
+        except Exception as E:
+            print(E)
+    return getEmptyPlot(), []
 
 @app.callback(
     Output('simulation1-mass-input', 'value'),
@@ -233,21 +264,24 @@ def callback(fMass1: float, fMass2: float):
 
 @app.callback(
     Output('simulation2-diameter-input', 'value'),
-    Output('simulation2-diameter-input', 'style'),
+    Output('shapegenerator-diameter-input', 'value'),
     Output('simulation1-diameter-input', 'style'),
+    Output('simulation2-diameter-input', 'style'),
+    Output('shapegenerator-diameter-input', 'style'),
     Input('simulation1-diameter-input', 'value'),
-    Input('simulation2-diameter-input', 'value')
+    Input('simulation2-diameter-input', 'value'),
+    Input('shapegenerator-diameter-input', 'value')
 )
-def callback(fDiameter: float, _Sim2Val):
+def callback(fDiameter: float, _Sim2Val, _GenVal):
     sTrigger = callback_context.triggered_id
     if sTrigger == 'simulation1-diameter-input':
         dcStyle = {"background-color": "rgba(75,225,25, 0.5)"} if fDiameter>0.0 else {"background-color": "white"}
-        return fDiameter, dcStyle, dcStyle
-    elif sTrigger == 'simulation2-diameter-input':
+        return fDiameter, fDiameter, dcStyle, dcStyle, dcStyle
+    elif sTrigger == 'simulation2-diameter-input' or sTrigger == 'shapegenerator-diameter-input':
         dcStyle = {"background-color": "white"}
-        return no_update, dcStyle, dcStyle
+        return no_update, no_update, dcStyle, dcStyle, dcStyle
     else:
-        return no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update
 
 
 @app.callback(
@@ -298,6 +332,43 @@ def callback(dcData: dict, _Button):
             print(E)  
     return no_update
 
+@app.callback(
+    Output('shapegenerator-results-download', 'data'),
+    State('shapegenerator-results-store', 'data'),
+    Input('shapegenerator-save-button', 'n_clicks')
+)
+def callback(lData: list, _Button):
+
+    if _Button:
+        try:
+            sName = 'parachute_{}.dxf'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+            _Dxf = ezdxf.new('R2000')
+            _Dxf.header['$MEASUREMENT'] = 1
+            _Dxf.units = units.M
+            _Dxf.layers.new(name="parachute", dxfattribs={"color": 0})
+            msp = _Dxf.modelspace()
+            msp.add_polyline2d(lData, dxfattribs={"layer": "parachute", "lineweight": 20})
+
+            _Dxf.saveas(sName)
+            with open(sName, 'r') as f:
+                content = f.read()
+
+            os.remove(sName)
+
+            return dict(content=content, filename=sName)
+        except Exception as E: 
+            print(E)  
+    return no_update
+
+@app.callback(
+    Output('modal-dragcoeffinfo', 'is_open'),
+    Input('input-dragcoeffinfo-button', 'n_clicks')
+)
+def callback(_Button):
+    if _Button:
+        return True
+    else:    
+        return no_update
 
 if __name__ == '__main__':
     webbrowser.open(r'http://127.0.0.1:8080', new=2)

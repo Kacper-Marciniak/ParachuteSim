@@ -1,6 +1,7 @@
 INPUT_DESCRIPTION =  "Sprecyzuj parametry fizyczne oraz środowiskowe dla symulacji. Gęstość powietrza może być zadana bezpośrednio lub wyznaczona wykorzystując parametry środowiskowe misji wpisane do pierwszej kolumny.",
-SIM1_DESCRIPTION = "Wyznacz średnicę czaszy spadochronu wymaganą do osiągnięcia docelowej prędkości opadania. Wartości MIN oraz MAX sterują zakresem prędkości, dla których wykonywane są obliczenia. Wyznaczona średnica spadochronu zostanie użyta w następnej sekcji.",
-SIM2_DESCRIPTION = "Wyznacz obciążenia występujące podczas otwarcia czaszy spadochronu o danej średnicy przy zadanej prędkości opadania. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w poprzedniej sekcji.",
+SIM1_DESCRIPTION = "Wyznacz średnicę czaszy spadochronu wymaganą do osiągnięcia docelowej prędkości opadania. Wartości MIN oraz MAX sterują zakresem prędkości, dla których wykonywane są obliczenia. Wyznaczona średnica spadochronu zostanie użyta w kolejnych sekcjach.",
+SIM2_DESCRIPTION = "Wyznacz obciążenia występujące podczas otwarcia czaszy spadochronu o danej średnicy przy zadanej prędkości opadania. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
+GENERATOR_DESCRIPTION = "Wyznacz kształt segmentów czaszy spadochronu. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
 INPUT_PARAMETERS_DESCRIPTION = """PARAMETRY GŁÓWNE
 
 Gęstość powietrza - wartość w kg/m^3 na wysokości otwarcia spadochronu. Do wpisania bezpośrednio lub wyznaczana przy użyciu dodatkowego modułu.
@@ -26,6 +27,7 @@ DESCRIPTION_INPUT_PARAMS = {
     "airdensity": "Gęstość powietrza na wysokości otwarcia spadochronu",
     "gaccel": "Przyśpieszenie ziemskie mierzone na platformie startowej",
     "dragcoeff": "Współczynnik oporu aerodynamicznego zależny od kształtu spadochronu",
+    "draginteg": "Znormalizowana wartość pola pod wykresem siły oporu aerodynamicznego w funkcji czasu",
 }
 
 DESCRIPTION_SIM1_PARAMS = {
@@ -40,4 +42,11 @@ DESCRIPTION_SIM2_PARAMS = {
     "mass" : "Rzeczywista masa pojazdu",
     "velocity": "Prędkość opadania przed otwarciem spadochronu",
     "diameter": "Średnica czaszy spadochronu"
+}
+
+DESCRIPTION_GENERATOR_PARAMS = {
+    "diameter": "Średnica czaszy spadochronu",
+    "segments": "Liczba segmentów czaszy spadochronu",
+    "spherepercent": "Współczynnik sferyczności czaszy spadochronu, gdzie 0.5 do spadochron półsferyczny",
+    "points": "Liczba punktów na segment czaszy spadochronu. Więcej punktów oznacza dokładniejsze odwzorowanie kształtu"
 }

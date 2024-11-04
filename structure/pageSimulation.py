@@ -3,102 +3,7 @@ import dash_bootstrap_components as dbc
 from structure.plotter import getEmptyPlot
 from structure.descriptions import *
 from Calculations.ConstantParameters import *
-
-APP_VERSION = '1.2'
-APP_YEAR = '2024'
-BASE_COLOR = '#008ede'
-
-def serveTooltip(sMessage: str, sTarget: str, sPlacement: str='top'):
-    return dbc.Tooltip(
-        sMessage,
-        target = sTarget,
-        placement = sPlacement,
-        style = {
-            "font-size": "16px",
-        }         
-    )
-
-def serveNavbar():
-    navbar = dbc.Navbar([
-        html.Div([
-            html.Div(
-                [
-                    html.A(html.Img(src=r"assets\logo_pwr.png", height="50px"), href=r'https://pwr.edu.pl/', className='logo-navbar'),
-                    html.A(html.Img(src=r"assets\logo2.png", height="50px"), href=r'https://pwrinspace.pwr.edu.pl/', className='logo-navbar'),
-                ], 
-                style={
-                    "display": "flex",
-                    "flex-direction": "row",
-                    "justify-content": "start",
-                    "align-items": "center",
-                    "gap": "5px",
-                    "width": "100%"
-                }
-            ),
-            html.Div(
-                [
-                    html.H1("ParaSim", style={"color": BASE_COLOR}),
-                    html.Img(src=r"assets\app_shadow.png", height="50px"),
-                ], 
-                style={
-                    "display": "flex",
-                    "flex-direction": "row",
-                    "justify-content": "center",
-                    "align-items": "center",
-                    "gap": "5px",
-                    "width": "100%"
-                }
-            ),
-            html.Div(
-                [
-                    html.A(html.Img(src=r"assets\logo_github.png", height="50px"), href=r'https://github.com/Kacper-Marciniak', className='logo-navbar'),
-                ], 
-                style={
-                    "display": "flex",
-                    "flex-direction": "row",
-                    "justify-content": "end",
-                    "align-items": "center",
-                    "gap": "5px",
-                    "width": "100%"
-                }
-            ),
-
-        ], style={
-                "display": "grid",
-                "grid-template-columns": "1fr auto 1fr",
-                "width": "100%",
-                "height": "100%",
-                "justify-content": "space-between",
-                "align-items": "center",
-                "padding": "0 10px 0 10px"
-            }
-        )
-    ], 
-    className= 'card-footer',
-    style={'height': '75px'},
-    sticky='top'
-    )
-    return navbar
-
-def serveFooter():
-    navbar = html.Footer([
-        html.Div([
-            html.P(f"ParaSim v.{APP_VERSION}", className='footer-text'),
-            html.P(APP_YEAR, className='footer-text'),
-        ], style={
-                "display": "flex",
-                "flex-direction": "column",
-                "width": "100%",
-                "height": "100%",
-                "justify-content": "space-around",
-                "align-items": "center"
-            }
-        )
-    ], 
-    className= 'card-footer',
-    style={'height': '50px'}
-    )
-    return navbar
+from structure.baseElements import serveTooltip, BASE_COLOR
 
 def serveInputData():
     return html.Div(
@@ -183,6 +88,7 @@ def serveInputData():
                             serveTooltip(DESCRIPTION_INPUT_PARAMS['dragcoeff'], 'input-dragcoeff-input'),
                             "Całka oporu aerodynamicznego [-]:",
                             dcc.Input(type='number', id='input-draginteg-input', min=0, step=.001, value=INPUT_PARAMETERS["DRAG_INTEGRAL"]),
+                            serveTooltip(DESCRIPTION_INPUT_PARAMS['draginteg'], 'input-draginteg-input'),
                             "Współczynnik wstrząsu przy otwarciu [-]:",
                             dcc.Input(type='number', id='input-schockfactor-input', min=0, step=.001, value=INPUT_PARAMETERS["OPENING_LOAD_SHOCK_FACTOR"]),
                             "Współczynnik redukcji siły przy otwarciu [-]:",
@@ -242,7 +148,18 @@ def serveInputData():
                                 "width": "100%",
                                 "padding": "5px"
                             }                    
-                        )
+                        ),
+                        dbc.Button(
+                            "Współczynnik oporu aerodynamicznego - informacje",
+                            id="input-dragcoeffinfo-button",
+                            style = {
+                                'width': '100%',
+                                'margin': '5px',
+                                'background-color': BASE_COLOR,
+                                'color': 'white',
+                                'border-color': BASE_COLOR
+                            }
+                        ),
                     ]),
                 ], style={
                     'grid-row': '3/-1',
@@ -487,3 +404,151 @@ def serveSim2():
             ],
             className='sim-container'
         )
+
+def serveShapeGenerator():
+    return html.Div(
+            [                
+                html.H2(
+                    "Generator kształtu czaszy spadochronu",
+                    style = {
+                        'grid-row': '1',
+                        'grid-column': '1/-1',
+                    },
+                    className='h2-box'
+                ),
+                dbc.Card([
+                    dbc.CardBody([
+                        html.Div(
+                            GENERATOR_DESCRIPTION,
+                            id = "shapegenerator-description-container",
+                            style={
+                                
+                                "width": "100%",
+                                "padding": "5px",
+                                "gap": "5px"
+                            }                    
+                        )
+                    ], className='card-info'),
+                ], style={
+                    'grid-row': '2',
+                    'grid-column': '1/-1',
+                    'height': '100%'
+                }, className='card-info'),
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.H3("Parametry wejściowe"),
+                    ), 
+                    dbc.CardBody([
+                        html.Div(
+                        [
+                            "Średnica spadochronu [m]:",
+                            dcc.Input(type='number', id='shapegenerator-diameter-input', min=0, step=.01, value=0.30),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['diameter'], 'shapegenerator-diameter-input'),
+                            "Liczba segmentów [-]:",
+                            dcc.Input(type='number', id='shapegenerator-segments-input', min=5, step=1, value=5),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['segments'], 'shapegenerator-segments-input'),
+                            "Współczynnik sferyczności [-]:",
+                            dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=0.01, max=.99, step=.01, value=0.5),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['spherepercent'], 'shapegenerator-spherepercent-input'),
+                            "Liczba punktów [-]:",
+                            dcc.Input(type='number', id='shapegenerator-points-input', min=3, max=100, step=1, value=10),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['points'], 'shapegenerator-points-input'),
+                        ], style={
+                            "display": "grid",
+                            "grid-template-columns": "1fr 75px",
+                            "width": "100%",
+                            "gap": "5px",
+                            "text-align": "right",
+                            "padding": "5px"
+                        }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '3',
+                    'grid-column': '1',
+                    'height': '100%'
+                }),
+                html.Div(
+                    [
+                        dbc.Button(
+                            "Przelicz",
+                            id="shapegenerator-run-button",
+                            style = {
+                                'width': '100%',
+                                'margin': '5px',
+                                'background-color': BASE_COLOR,
+                                'color': 'white',
+                                'border-color': BASE_COLOR
+                            }
+                        ),
+                        dbc.Button(
+                            "💾 Zapisz",
+                            id="shapegenerator-save-button",
+                            style = {
+                                'width': '100%',
+                                'margin': '5px',
+                                'background-color': BASE_COLOR,
+                                'color': 'white',
+                                'border-color': BASE_COLOR
+                            }
+                        ),
+                    ],
+                    className='buttons-container'
+                ),
+                dbc.Card([
+                    dbc.CardHeader(html.H3("Wyniki")), 
+                    dbc.CardBody([
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    id = 'shapegenerator-results-plot',
+                                    figure = getEmptyPlot(),
+                                    config = {
+                                        'responsive': False,
+                                        'displayModeBar': True,
+                                        'toImageButtonOptions': {
+                                            'format': 'png',
+                                            'filename': 'parasim_plot',
+                                            },
+                                    },
+                                    style={"width": "100%", "height": "100%"},
+                                ),
+                            ], style={
+                                "width": "100%",
+                                "height": "100%",
+                                "padding" : "5px"
+                            }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '3/-1',
+                    'grid-column': '2',
+                    'height': '100%'
+                }),
+            ],
+            className='sim-container'
+        )
+
+from Calculations.CoeffInfo import COEFF_INFO
+
+def serveModalDragCoeffInfo():
+    modal = dbc.Modal([
+        dbc.ModalHeader(html.H2("Współczynnik oporu aerodynamicznego")),
+        dbc.ModalBody([
+            html.Div(
+                [
+                    html.H3("Kształt spadochronu"),
+                    html.H3("Współczynnik"),
+                ] + [val for row in [(html.B(key), val) for key,val in COEFF_INFO.items()] for val in row],
+                style={
+                    "display": "grid",
+                    "grid-template-columns": "1fr auto",
+                    "width": "100%",
+                    "gap": "10px",
+                    "text-align": "right",
+                    "padding": "5px"
+                }
+            )
+        ]),
+    ], id='modal-dragcoeffinfo', is_open=False)
+    return modal

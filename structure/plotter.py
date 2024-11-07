@@ -188,21 +188,15 @@ def plotShape3D(fSphereRadius: float, fSpherePercent: float, fHolePercent: float
 
     STEPS_U_SEGMENT = round((1.0/iNumberOfSegments)*360)
     STEPS_U_REST = 360-STEPS_U_SEGMENT
-    STEPS_O = 180
+    STEPS_O = 360
 
     # ADD SINGLE SEGMENT
 
-    u, v = np.meshgrid(np.linspace(0,2*np.pi/iNumberOfSegments,STEPS_U_SEGMENT), np.linspace(0,np.pi,STEPS_O))
+    u, v = np.meshgrid(np.linspace(0,2*np.pi/iNumberOfSegments,STEPS_U_SEGMENT), np.linspace(fHolePercent*np.pi,fSpherePercent*np.pi,STEPS_O))
 
     x = fSphereRadius * np.cos(u)*np.sin(v)
     y = fSphereRadius * np.sin(u)*np.sin(v)
     z = fSphereRadius * np.cos(v)
-
-    indices = np.logical_and(z <= (1-fHolePercent)*2*fSphereRadius-fSphereRadius, z >= (1-fSpherePercent)*2*fSphereRadius-fSphereRadius)
-
-    x[~indices] = np.nan
-    y[~indices] = np.nan
-    z[~indices] = np.nan
 
     # Add surface trace
     dcFigure.add_trace(
@@ -211,7 +205,7 @@ def plotShape3D(fSphereRadius: float, fSpherePercent: float, fHolePercent: float
             y=y,
             z=z,
             showlegend=False,
-            hoverinfo='none',
+            hoverinfo='x+y+z',
             opacity=1.0,
             colorscale = [[0, 'crimson'], [1, 'crimson']],
             showscale = False,
@@ -220,17 +214,11 @@ def plotShape3D(fSphereRadius: float, fSpherePercent: float, fHolePercent: float
 
     # ADD THE REST
 
-    u, v = np.meshgrid(np.linspace(2*np.pi/iNumberOfSegments,2*np.pi,STEPS_U_REST), np.linspace(0,np.pi,STEPS_O))
+    u, v = np.meshgrid(np.linspace(2*np.pi/iNumberOfSegments,2*np.pi, STEPS_U_REST), np.linspace(fHolePercent*np.pi,fSpherePercent*np.pi,STEPS_O))
 
     x = fSphereRadius * np.cos(u)*np.sin(v)
     y = fSphereRadius * np.sin(u)*np.sin(v)
     z = fSphereRadius * np.cos(v)
-
-    indices = np.logical_and(z <= (1-fHolePercent)*2*fSphereRadius-fSphereRadius, z >= (1-fSpherePercent)*2*fSphereRadius-fSphereRadius)
-
-    x[~indices] = np.nan
-    y[~indices] = np.nan
-    z[~indices] = np.nan
 
     # Add surface trace
     dcFigure.add_trace(

@@ -11,7 +11,7 @@ import os
 
 from structure.pageSimulation import serveSim1, serveSim2, serveInputData, serveShapeGenerator, serveModalDragCoeffInfo
 from structure.baseElements import serveNavbar, serveFooter
-from structure.plotter import plotResults, plotShape, getEmptyPlot
+from structure.plotter import plotResults, plotShape, plotShape3D, getEmptyPlot
 from Calculations.CParachute import CParachute, calculateDiameterVelocityRelationship
 from Calculations.CShapeGenerator import CShapeGenerator
 from Calculations.Air import getAirDensity
@@ -53,10 +53,14 @@ def display_page(sUrl: str | None):
     return html.Div(
         [
             serveNavbar(),
-            serveInputData(),
-            serveSim1(),
-            serveSim2(),
-            serveShapeGenerator(),
+            html.Div([
+                serveInputData(),
+                serveSim1(),
+                serveSim2(),
+                serveShapeGenerator(),
+                ],
+                className='page-content-body'
+            ),
             serveFooter(),
             serveModalDragCoeffInfo()
         ],
@@ -220,26 +224,33 @@ Szczytowe obciążenie przy otwarciu:
     
 @app.callback(
     Output('shapegenerator-results-plot', 'figure'),    
+    Output('shapegenerator-results2-plot', 'figure'),    
     Output('shapegenerator-results-store', 'data'),
     State('shapegenerator-diameter-input', 'value'),
     State('shapegenerator-segments-input', 'value'),
     State('shapegenerator-spherepercent-input', 'value'),
     State('shapegenerator-points-input', 'value'),
+    State('shapegenerator-holediameter-input', 'value'),
     Input('shapegenerator-run-button', 'n_clicks')
 )
-def callback(fDiameter: float, iSegments: int, fSpherePercent: float, iNPoints: int, _Button):
+def callback(fDiameter: float, iSegments: int, fSpherePercent: float, iNPoints: int, fHoleDiameter: float, _Button):
     if _Button:
         try:
-            cGenerator = CShapeGenerator(fSpherePercent, fDiameter, iSegments)
+            cGenerator = CShapeGenerator(fSpherePercent, fDiameter, iSegments, fHoleDiameter)
             aContour = cGenerator.getSegmentShape(iNPoints)
 
             return plotShape(
                 aContour[:,1], aContour[:,0], 
                 sColour="black"
+            ), plotShape3D(
+                cGenerator.fSphereRadius,
+                cGenerator.fSpherePercent,
+                cGenerator.fHolePercent,
+                cGenerator.iNumberOfSegments
             ), aContour.tolist()
         except Exception as E:
             print(E)
-    return getEmptyPlot(), []
+    return getEmptyPlot(), getEmptyPlot(), []
 
 @app.callback(
     Output('simulation1-mass-input', 'value'),

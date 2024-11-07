@@ -48,5 +48,6 @@ DESCRIPTION_GENERATOR_PARAMS = {
     "diameter": "Średnica czaszy spadochronu",
     "segments": "Liczba segmentów czaszy spadochronu",
     "spherepercent": "Współczynnik sferyczności czaszy spadochronu, gdzie 0.5 do spadochron półsferyczny",
+    "holediameter": "Średnica otworu w czaszy spadochronu",
     "points": "Liczba punktów na segment czaszy spadochronu. Więcej punktów oznacza dokładniejsze odwzorowanie kształtu"
 }

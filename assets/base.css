@@ -98,7 +98,7 @@ textarea {
     width: 100%;
     border: none;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.25);
-    border-radius: 10px !important;
+    border-radius: 0px !important;
 }
 
 .card-info{
@@ -116,6 +116,20 @@ textarea {
 .sim-container {
     display: grid;
     grid-template-columns: minmax(400px, 1fr) 3fr;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 10px;
+    align-items: stretch;
+    justify-content: space-between;  
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px !important;
+    border: none;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.25);
+}
+
+.shape-container {
+    display: grid;
+    grid-template-columns: minmax(400px, 1fr) 2fr 2fr;
     grid-template-rows: auto auto 1fr auto;
     gap: 10px;
     align-items: stretch;
@@ -146,11 +160,19 @@ textarea {
     flex-direction: column;
     justify-content: space-between;
     align-items: stretch;
-    padding: 20px 25px 20px 25px;
-    gap: 15px;
     width: 100%;
     min-height: 100vh;
     min-width: 1280px
+}
+
+.page-content-body{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    padding: 20px;
+    gap: 15px;
+    width: 100%;
 }
 
 @media screen and (max-width: 850px) {

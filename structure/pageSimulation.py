@@ -126,7 +126,7 @@ def serveInputData():
                             }
                         ),
                         dbc.Button(
-                            "💾 Zapisz",
+                            "💾 Zapisz CSV",
                             id="input-save-button",
                             style = {
                                 'width': '100%',
@@ -250,7 +250,7 @@ def serveSim1():
                             }
                         ),
                         dbc.Button(
-                            "💾 Zapisz",
+                            "💾 Zapisz CSV",
                             id="simulation1-save-button",
                             style = {
                                 'width': '100%',
@@ -371,7 +371,7 @@ def serveSim2():
                             }
                         ),
                         dbc.Button(
-                            "💾 Zapisz",
+                            "💾 Zapisz CSV",
                             id="simulation2-save-button",
                             style = {
                                 'width': '100%',
@@ -409,7 +409,7 @@ def serveShapeGenerator():
     return html.Div(
             [                
                 html.H2(
-                    "Generator kształtu czaszy spadochronu",
+                    "Generator kształtu czaszy spadochronu sferycznego",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -450,6 +450,9 @@ def serveShapeGenerator():
                             "Współczynnik sferyczności [-]:",
                             dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=0.01, max=.99, step=.01, value=0.5),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['spherepercent'], 'shapegenerator-spherepercent-input'),
+                            "Średnica górnego otworu [m]:",
+                            dcc.Input(type='number', id='shapegenerator-holediameter-input', min=0, step=.01, value=0),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['holediameter'], 'shapegenerator-holediameter-input'),
                             "Liczba punktów [-]:",
                             dcc.Input(type='number', id='shapegenerator-points-input', min=3, max=100, step=1, value=10),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['points'], 'shapegenerator-points-input'),
@@ -482,7 +485,7 @@ def serveShapeGenerator():
                             }
                         ),
                         dbc.Button(
-                            "💾 Zapisz",
+                            "💾 Zapisz DXF",
                             id="shapegenerator-save-button",
                             style = {
                                 'width': '100%',
@@ -496,7 +499,7 @@ def serveShapeGenerator():
                     className='buttons-container'
                 ),
                 dbc.Card([
-                    dbc.CardHeader(html.H3("Wyniki")), 
+                    dbc.CardHeader(html.H3("Wyniki - segment")), 
                     dbc.CardBody([
                         html.Div(
                             [
@@ -525,8 +528,38 @@ def serveShapeGenerator():
                     'grid-column': '2',
                     'height': '100%'
                 }),
+                dbc.Card([
+                    dbc.CardHeader(html.H3("Wyniki - wizualizacja")), 
+                    dbc.CardBody([
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    id = 'shapegenerator-results2-plot',
+                                    figure = getEmptyPlot(),
+                                    config = {
+                                        'responsive': False,
+                                        'displayModeBar': True,
+                                        'toImageButtonOptions': {
+                                            'format': 'png',
+                                            'filename': 'parasim_plot',
+                                            },
+                                    },
+                                    style={"width": "100%", "height": "100%"},
+                                ),
+                            ], style={
+                                "width": "100%",
+                                "height": "100%",
+                                "padding" : "5px"
+                            }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '3/-1',
+                    'grid-column': '3',
+                    'height': '100%'
+                }),
             ],
-            className='sim-container'
+            className='shape-container'
         )
 
 from Calculations.CoeffInfo import COEFF_INFO

@@ -236,17 +236,14 @@ Szczytowe obciążenie przy otwarciu:
 def callback(fDiameter: float, iSegments: int, fSpherePercent: float, iNPoints: int, fHoleDiameter: float, _Button):
     if _Button:
         try:
-            cGenerator = CShapeGenerator(fSpherePercent, fDiameter, iSegments, fHoleDiameter)
-            aContour = cGenerator.getSegmentShape(iNPoints)
+            cGenerator = CShapeGenerator(fSpherePercent, fDiameter, iSegments, fHoleDiameter, iNPoints)
+            aContour = cGenerator.get2DRepresentation()
 
             return plotShape(
                 aContour[:,1], aContour[:,0], 
                 sColour="black"
             ), plotShape3D(
-                cGenerator.fSphereRadius,
-                cGenerator.fThetaStart,
-                cGenerator.fThetaEnd,
-                cGenerator.fPhiEnd
+                cGenerator.get3DRepresentation()
             ), aContour.tolist()
         except Exception as E:
             print(E)

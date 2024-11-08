@@ -445,7 +445,7 @@ def serveShapeGenerator():
                             dcc.Input(type='number', id='shapegenerator-diameter-input', min=0, step=.01, value=0.30),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['diameter'], 'shapegenerator-diameter-input'),
                             "Liczba segmentów [-]:",
-                            dcc.Input(type='number', id='shapegenerator-segments-input', min=5, step=1, value=5),
+                            dcc.Input(type='number', id='shapegenerator-segments-input', min=5, step=1, value=8),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['segments'], 'shapegenerator-segments-input'),
                             "Współczynnik sferyczności [-]:",
                             dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=0.05, max=.95, step=.01, value=0.5),
@@ -454,7 +454,7 @@ def serveShapeGenerator():
                             dcc.Input(type='number', id='shapegenerator-holediameter-input', min=0, step=.01, value=0),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['holediameter'], 'shapegenerator-holediameter-input'),
                             "Liczba punktów [-]:",
-                            dcc.Input(type='number', id='shapegenerator-points-input', min=3, max=100, step=1, value=10),
+                            dcc.Input(type='number', id='shapegenerator-points-input', min=5, max=250, step=1, value=15),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['points'], 'shapegenerator-points-input'),
                         ], style={
                             "display": "grid",
@@ -499,7 +499,7 @@ def serveShapeGenerator():
                     className='buttons-container'
                 ),
                 dbc.Card([
-                    dbc.CardHeader(html.H3("Wyniki - segment")), 
+                    dbc.CardHeader(html.H3("Wyniki - 2D")), 
                     dbc.CardBody([
                         html.Div(
                             [
@@ -529,7 +529,7 @@ def serveShapeGenerator():
                     'height': '100%'
                 }),
                 dbc.Card([
-                    dbc.CardHeader(html.H3("Wyniki - wizualizacja")), 
+                    dbc.CardHeader(html.H3("Wyniki - 3D")), 
                     dbc.CardBody([
                         html.Div(
                             [

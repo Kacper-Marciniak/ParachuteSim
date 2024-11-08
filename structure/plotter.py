@@ -122,7 +122,7 @@ def plotShape(aXArray: np.ndarray, aYArray: np.ndarray, sColour: str = "black"):
     # Add text
     dcFigure.add_trace(
         go.Scatter(
-            x = [np.min(aXArray)], 
+            x = [np.min(aXArray)+(np.max(aXArray)-np.min(aXArray))/2], 
             y = [np.max(aYArray)],
             text = f"SX={np.max(aXArray)-np.min(aXArray):.3f}m; SY={np.max(aYArray)-np.min(aYArray):.3f}m",
             mode = "text",
@@ -182,69 +182,95 @@ def plotShape(aXArray: np.ndarray, aYArray: np.ndarray, sColour: str = "black"):
     return {'data': dcFigure['data'],'layout': dcFigure['layout']}
 
 
-def plotShape3D(fSphereRadius: float, fThetaStart: float, fThetaEnd: float, fPhiEnd: float):
+def plotShape3D(tPoints: tuple[np.ndarray,np.ndarray,np.ndarray]):
 
     dcFigure = go.Figure()
 
-    STEPS_U_SEGMENT = round((fPhiEnd/(2.0*np.pi))*360)
-    STEPS_U_REST = 360-STEPS_U_SEGMENT
-    STEPS_O = 360
-
-    aTheta = np.linspace(fThetaStart,fThetaEnd,STEPS_O)
-
-    # ADD SINGLE SEGMENT
-
-    u, v = np.meshgrid(np.linspace(0,fPhiEnd,STEPS_U_SEGMENT), aTheta)
-
-    x = fSphereRadius * np.cos(u)*np.sin(v)
-    y = fSphereRadius * np.sin(u)*np.sin(v)
-    z = fSphereRadius * np.cos(v)
-
+    x, y, z = tPoints
     # Add surface trace
     dcFigure.add_trace(
         go.Surface(
-            x=x,
-            y=y,
-            z=z,
+            x=x[:,:2],
+            y=y[:,:2],
+            z=z[:,:2],
             showlegend=False,
             hoverinfo='x+y+z',
             opacity=1.0,
+            colorscale = "viridis", #[[0, 'crimson'], [1, 'crimson']],
+            showscale = False,
+        )
+    )
+    dcFigure.add_trace(
+        go.Surface(
+            x=x[:,1:],
+            y=y[:,1:],
+            z=z[:,1:],
+            showlegend=False,
+            hoverinfo='x+y+z',
+            opacity=.5,
             colorscale = [[0, 'crimson'], [1, 'crimson']],
             showscale = False,
         )
     )
 
-    # ADD THE REST
-
-    u, v = np.meshgrid(np.linspace(fPhiEnd,2*np.pi, STEPS_U_REST), aTheta)
-
-    x = fSphereRadius * np.cos(u)*np.sin(v)
-    y = fSphereRadius * np.sin(u)*np.sin(v)
-    z = fSphereRadius * np.cos(v)
-
-    # Add surface trace
+    # Add contour
     dcFigure.add_trace(
-        go.Surface(
-            x=x,
-            y=y,
-            z=z,
+        go.Scatter3d(
+            x=x[:,0],
+            y=y[:,0],
+            z=z[:,0],
+            mode='lines',
+            line=dict(color='black', width=2),
             showlegend=False,
             hoverinfo='none',
-            opacity=0.50,
-            colorscale = [[0, 'royalblue'], [1, 'royalblue']],
-            showscale = False,
+            opacity=1,
         )
     )
-
+    dcFigure.add_trace(
+        go.Scatter3d(
+            x=x[:,1],
+            y=y[:,1],
+            z=z[:,1],
+            mode='lines',
+            line=dict(color='black', width=2),
+            showlegend=False,
+            hoverinfo='none',
+            opacity=1,
+        )
+    )
+    dcFigure.add_trace(
+        go.Scatter3d(
+            x=x[0,:],
+            y=y[0,:],
+            z=z[0,:],
+            mode='lines',
+            line=dict(color='black', width=2),
+            showlegend=False,
+            hoverinfo='none',
+            opacity=1,
+        )
+    )
+    dcFigure.add_trace(
+        go.Scatter3d(
+            x=x[-1,:],
+            y=y[-1,:],
+            z=z[-1,:],
+            mode='lines',
+            line=dict(color='black', width=2),
+            showlegend=False,
+            hoverinfo='none',
+            opacity=1,
+        )
+    )
 
     # Add axis
     dcFigure.add_trace(
         go.Scatter3d(
             x=[0,0],
             y=[0,0],
-            z=[np.nanmin(z),fSphereRadius],
+            z=[np.nanmin(z),np.nanmax(z)],
             mode='lines',
-            line=dict(color='black', width=1),
+            line=dict(color='crimson', width=2),
             showlegend=False,
             hoverinfo='none',
             opacity=1,

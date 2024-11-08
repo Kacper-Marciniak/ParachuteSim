@@ -448,7 +448,7 @@ def serveShapeGenerator():
                             dcc.Input(type='number', id='shapegenerator-segments-input', min=5, step=1, value=5),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['segments'], 'shapegenerator-segments-input'),
                             "Współczynnik sferyczności [-]:",
-                            dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=0.01, max=.99, step=.01, value=0.5),
+                            dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=0.05, max=.95, step=.01, value=0.5),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['spherepercent'], 'shapegenerator-spherepercent-input'),
                             "Średnica górnego otworu [m]:",
                             dcc.Input(type='number', id='shapegenerator-holediameter-input', min=0, step=.01, value=0),

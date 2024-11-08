@@ -244,9 +244,9 @@ def callback(fDiameter: float, iSegments: int, fSpherePercent: float, iNPoints: 
                 sColour="black"
             ), plotShape3D(
                 cGenerator.fSphereRadius,
-                cGenerator.fSpherePercent,
-                cGenerator.fHolePercent,
-                cGenerator.iNumberOfSegments
+                cGenerator.fThetaStart,
+                cGenerator.fThetaEnd,
+                cGenerator.fPhiEnd
             ), aContour.tolist()
         except Exception as E:
             print(E)

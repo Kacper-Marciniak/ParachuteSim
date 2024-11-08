@@ -182,17 +182,19 @@ def plotShape(aXArray: np.ndarray, aYArray: np.ndarray, sColour: str = "black"):
     return {'data': dcFigure['data'],'layout': dcFigure['layout']}
 
 
-def plotShape3D(fSphereRadius: float, fSpherePercent: float, fHolePercent: float, iNumberOfSegments: int):
+def plotShape3D(fSphereRadius: float, fThetaStart: float, fThetaEnd: float, fPhiEnd: float):
 
     dcFigure = go.Figure()
 
-    STEPS_U_SEGMENT = round((1.0/iNumberOfSegments)*360)
+    STEPS_U_SEGMENT = round((fPhiEnd/(2.0*np.pi))*360)
     STEPS_U_REST = 360-STEPS_U_SEGMENT
     STEPS_O = 360
 
+    aTheta = np.linspace(fThetaStart,fThetaEnd,STEPS_O)
+
     # ADD SINGLE SEGMENT
 
-    u, v = np.meshgrid(np.linspace(0,2*np.pi/iNumberOfSegments,STEPS_U_SEGMENT), np.linspace(fHolePercent*np.pi,fSpherePercent*np.pi,STEPS_O))
+    u, v = np.meshgrid(np.linspace(0,fPhiEnd,STEPS_U_SEGMENT), aTheta)
 
     x = fSphereRadius * np.cos(u)*np.sin(v)
     y = fSphereRadius * np.sin(u)*np.sin(v)
@@ -214,7 +216,7 @@ def plotShape3D(fSphereRadius: float, fSpherePercent: float, fHolePercent: float
 
     # ADD THE REST
 
-    u, v = np.meshgrid(np.linspace(2*np.pi/iNumberOfSegments,2*np.pi, STEPS_U_REST), np.linspace(fHolePercent*np.pi,fSpherePercent*np.pi,STEPS_O))
+    u, v = np.meshgrid(np.linspace(fPhiEnd,2*np.pi, STEPS_U_REST), aTheta)
 
     x = fSphereRadius * np.cos(u)*np.sin(v)
     y = fSphereRadius * np.sin(u)*np.sin(v)

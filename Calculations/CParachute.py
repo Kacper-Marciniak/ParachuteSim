@@ -9,14 +9,22 @@ def getDiamaterFromVelocity(_TargetVelocity: np.ndarray | float, fMass: float, d
     """
     Get required parachute area for given target velocity
     """
-    return 2*np.sqrt((2*fMass*dcParameters["G_ACCELERATION"]/(dcParameters["AIR_DENSITY"]*_TargetVelocity**2*dcParameters["DRAG_COEFF"]))/np.pi)
+    fEffectiveArea = (2*fMass*dcParameters["G_ACCELERATION"]/(dcParameters["AIR_DENSITY"]*_TargetVelocity**2*dcParameters["DRAG_COEFF"]))
+    if dcParameters["CANOPY_TYPE"] in ("spherical", "flat_disk", "conical"):
+        fMaxDiameter = 2*np.sqrt(fEffectiveArea/np.pi)
+    else:
+        raise ValueError("Unsupported canopy type!")
+    return fMaxDiameter
     
-def getVelocityFromDiameter(_Diameter: np.ndarray | float, fMass: float, dcParameters: dict = INPUT_PARAMETERS):
+def getVelocityFromDiameter(_MaxDiameter: np.ndarray | float, fMass: float, dcParameters: dict = INPUT_PARAMETERS):
     """
     Get velocity for given parachute diameter
     """
-    fArea = (_Diameter/2.0)**2*np.pi
-    return np.sqrt(2*fMass*dcParameters["G_ACCELERATION"]/(dcParameters["AIR_DENSITY"]*fArea*dcParameters["DRAG_COEFF"]))
+    if dcParameters["CANOPY_TYPE"] in ("spherical", "flat_disk", "conical"):
+        fEffectiveArea = (_MaxDiameter/2.0)**2*np.pi
+    else:
+        raise ValueError("Unsupported canopy type!")
+    return np.sqrt(2*fMass*dcParameters["G_ACCELERATION"]/(dcParameters["AIR_DENSITY"]*fEffectiveArea*dcParameters["DRAG_COEFF"]))
 
 def calculateDiameterVelocityRelationship(
         fMass: float,

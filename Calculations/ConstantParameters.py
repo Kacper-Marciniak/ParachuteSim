@@ -1,3 +1,5 @@
+from Calculations.CoeffInfo import COEFF_VALUES_DEFAULT
+
 LAPSE_RATE = 9.8e-3 # [K/m]
 KELVIN_OFFSET = 273.15
 MOLAR_MASS_AIR = 0.0289644 # [kg/mol]
@@ -7,11 +9,18 @@ WATER_VAPOUR_GAS_CONSTANT = 461.495 # [J/(kg·K)]
 
 INPUT_PARAMETERS = {
     "AIR_DENSITY": 1.3, #[kg/m3]
-    "DRAG_COEFF": 0.7, #[-]
+    "DRAG_COEFF": COEFF_VALUES_DEFAULT["spherical"], #[-]
     "G_ACCELERATION": 9.81, #[m/s**2]
     "DRAG_INTEGRAL": 0.45, # [-],
     "INFLATION_CANOPY_FILL_CONST": 5, #[-],
     "DECCELERATION_EXPONENT": 0.85, #[-],
     "OPENING_LOAD_SHOCK_FACTOR": 1.6, #[-],
     "OPENING_FORCE_REDUCTION_FACTOR": 0.9, #[-]
+    "CANOPY_TYPE": "spherical"
 }
+
+AVAILABLE_CANOPY_TYPES = [
+       {'label': 'Sferyczny', 'value': 'spherical'},
+       {'label': 'Płaski dysk', 'value': 'flat_disk'},
+       {'label': 'Stożkowy', 'value': 'conical'},
+]

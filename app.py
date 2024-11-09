@@ -16,6 +16,7 @@ from Calculations.CParachute import CParachute, calculateDiameterVelocityRelatio
 from Calculations.CShapeGenerator import CShapeGenerator
 from Calculations.Air import getAirDensity
 from Calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET
+from Calculations.CoeffInfo import COEFF_VALUES_DEFAULT
 
 import numpy as np
 
@@ -109,6 +110,22 @@ def callback(fRefPressure: float, fRefTemp: float, fHeight: float, fHumidity: fl
     return no_update, no_update, no_update, no_update, {}
 
 @app.callback(
+    Output('input-dragcoeff-input', 'value'),
+    Output('input-dragcoeff-input', 'style'),
+    Output('input-canopytype-dropdown', 'style'),
+    Input('input-canopytype-dropdown', 'value'),
+    Input('input-dragcoeff-input', 'value'),
+)
+def callback(sCanopyType: str, _ValDragCoeff):
+    sTrigger = callback_context.triggered_id
+    if sCanopyType in COEFF_VALUES_DEFAULT and sTrigger == 'input-canopytype-dropdown':
+        return COEFF_VALUES_DEFAULT[sCanopyType], {"background-color": "rgba(225,225,0, 0.5)"}, {"background-color": "rgba(225,225,0, 0.5)"}
+    elif sTrigger == 'input-dragcoeff-input':
+        return no_update, {"background-color": "rgba(255,255,255, 1)"}, {"background-color": "rgba(255,255,255, 1)"}
+    else:
+        return no_update, no_update, no_update
+
+@app.callback(
     Output('input-parameters-store', 'data'),
     Input('input-airdensity-input', 'value'),
     Input('input-gaccel-input', 'value'),
@@ -118,9 +135,10 @@ def callback(fRefPressure: float, fRefTemp: float, fHeight: float, fHumidity: fl
     Input('input-fillconst-input', 'value'),
     Input('input-deccel-input', 'value'),
     Input('input-draginteg-input', 'value'),
+    Input('input-canopytype-dropdown', 'value'),
     State('input-parameters-store', 'data')
 )
-def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFactor: float, fForceReduction: float, fFillConst: float, fDeccelExp: float, fDragInteg: float, dcStore: dict):
+def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFactor: float, fForceReduction: float, fFillConst: float, fDeccelExp: float, fDragInteg: float, sCanopyType: str, dcStore: dict):
     dcStore["AIR_DENSITY"] = fAirDensity
     dcStore["DRAG_COEFF"] = fDragCoeff
     dcStore["G_ACCELERATION"] = fGAccel
@@ -129,6 +147,7 @@ def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFacto
     dcStore["INFLATION_CANOPY_FILL_CONST"] = fFillConst
     dcStore["DECCELERATION_EXPONENT"] = fDeccelExp
     dcStore["DRAG_INTEGRAL"] = fDragInteg
+    dcStore["CANOPY_TYPE"] = sCanopyType
     return dcStore
 
 @app.callback(

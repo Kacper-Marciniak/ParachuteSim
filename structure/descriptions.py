@@ -27,7 +27,8 @@ DESCRIPTION_INPUT_PARAMS = {
     "airdensity": "Gęstość powietrza na wysokości otwarcia spadochronu",
     "gaccel": "Przyśpieszenie ziemskie mierzone na platformie startowej",
     "dragcoeff": "Współczynnik oporu aerodynamicznego zależny od kształtu spadochronu",
-    "draginteg": "Znormalizowana wartość pola pod wykresem siły oporu aerodynamicznego w funkcji czasu",
+    "draginteg": "Znormalizowana wartość pola pod wykresem siły oporu aerodynamicznego w funkcji czasu (w chwili czasowej otwarcia spadochronu)",
+    "canopytype": "Typ czaszy spadochronu"
 }
 
 DESCRIPTION_SIM1_PARAMS = {
@@ -41,11 +42,11 @@ DESCRIPTION_SIM1_PARAMS = {
 DESCRIPTION_SIM2_PARAMS = {
     "mass" : "Rzeczywista masa pojazdu",
     "velocity": "Prędkość opadania przed otwarciem spadochronu",
-    "diameter": "Średnica czaszy spadochronu"
+    "diameter": "Efektywna średnica czaszy spadochronu"
 }
 
 DESCRIPTION_GENERATOR_PARAMS = {
-    "diameter": "Średnica czaszy spadochronu",
+    "diameter": "Efektywna średnica czaszy spadochronu",
     "segments": "Liczba segmentów czaszy spadochronu",
     "spherepercent": "Współczynnik sferyczności czaszy spadochronu, gdzie 0.5 do spadochron półsferyczny",
     "holediameter": "Średnica otworu w czaszy spadochronu",

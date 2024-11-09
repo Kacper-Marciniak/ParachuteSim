@@ -9,13 +9,17 @@ class CShapeGenerator():
         self.fHoleDiameter = np.clip(fHoleDiameter, 0.0, self.fCanopyDiameter)
         self.iNPoints = np.clip(iNPoints, 1, 250)
         
-        self.fSphereRadius = self.fCanopyDiameter/(4.0*(self.fSpherePercent-self.fSpherePercent**2)**.5)
+        if self.fSpherePercent < 0.50:
+            self.fSphereRadius = self.fCanopyDiameter/(4.0*(self.fSpherePercent-self.fSpherePercent**2)**.5)
+        else:
+            # If sphere percent >= 0.50 then effective diameter is the same as in half-sphere
+            self.fSphereRadius = self.fCanopyDiameter/2
+
 
         # Spherical coordinates
         # Theta
         self.fThetaStart = np.arcsin(self.fHoleDiameter/(2.0*self.fSphereRadius)) if self.fHoleDiameter > 0.0 else 0.0
-        self.fThetaEnd = np.arcsin(self.fCanopyDiameter/(2.0*self.fSphereRadius)) if self.fCanopyDiameter > 0.0 else 0.0
-        if self.fSpherePercent > 0.50: self.fThetaEnd = np.pi-self.fThetaEnd 
+        self.fThetaEnd = np.arccos(1-2*self.fSpherePercent)
 
         # Phi
         self.fPhiStart = 0.0

@@ -7,3 +7,9 @@ COEFF_INFO = {
     "Pierścieniowy": "0.85 - 0.95",
     "Krzyżowy": "0.60 - 0.85"
 }
+
+COEFF_VALUES_DEFAULT = {
+    "spherical": 0.7,
+    "flat_disk": 0.75,
+    "conical": 0.80,
+}

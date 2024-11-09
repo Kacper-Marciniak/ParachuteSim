@@ -104,8 +104,21 @@ def serveInputData():
                             "gap": "5px",
                             "text-align": "right",
                             "padding": "5px"
+                        }                        
+                        ),
+                        html.Div([
+                            "Kształt spadochronu:",
+                            dcc.Dropdown(id='input-canopytype-dropdown', value=INPUT_PARAMETERS["CANOPY_TYPE"], options=AVAILABLE_CANOPY_TYPES),
+                            serveTooltip(DESCRIPTION_INPUT_PARAMS['canopytype'], 'input-canopytype-dropdown'),
+                        ], style={
+                            "display": "grid",
+                            "grid-template-columns": "auto 1fr",
+                            "width": "100%",
+                            "gap": "5px",
+                            "padding": "5px"
                         }
                         )
+                        
                     ]),
                 ], style={
                     'grid-row': '3/-1',
@@ -174,7 +187,7 @@ def serveSim1():
     return html.Div(
             [                
                 html.H2(
-                    "Wymagana średnica czaszy spadochronu",
+                    "Wymagana efektywna średnica czaszy spadochronu",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -216,7 +229,7 @@ def serveSim1():
                             "Oczekiwana prędkość opadania [m/s]:",
                             dcc.Input(type='number', id='simulation1-velocity-input', min=0, step=.1, value=10.0),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['velocity'], 'simulation1-velocity-input'),
-                            "Wyznaczona średnica czaszy [m]:",
+                            "Wyznaczona efektywna średnica czaszy [m]:",
                             dcc.Input(type='number', id='simulation1-diameter-input', value=0.0, disabled=True),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['diameter'], 'simulation1-diameter-input'),
                             "Język etykiet na wykresie:",
@@ -339,7 +352,7 @@ def serveSim2():
                             "Prędkość przy otwarciu [m/s]:",
                             dcc.Input(type='number', id='simulation2-velocity-input', min=0, step=.1, value=40.0),
                             serveTooltip(DESCRIPTION_SIM2_PARAMS['velocity'], 'simulation2-velocity-input'),
-                            "Średnica spadochronu [m]:",
+                            "Efektywna średnica spadochronu [m]:",
                             dcc.Input(type='number', id='simulation2-diameter-input', min=0, step=.01, value=0.30),
                             serveTooltip(DESCRIPTION_SIM2_PARAMS['diameter'], 'simulation2-diameter-input'),
                         ], style={
@@ -441,7 +454,7 @@ def serveShapeGenerator():
                     dbc.CardBody([
                         html.Div(
                         [
-                            "Średnica spadochronu [m]:",
+                            "Efektywna średnica spadochronu [m]:",
                             dcc.Input(type='number', id='shapegenerator-diameter-input', min=0, step=.01, value=0.30),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['diameter'], 'shapegenerator-diameter-input'),
                             "Liczba segmentów [-]:",

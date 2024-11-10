@@ -15,8 +15,7 @@ from structure.plotter import plotResults, plotShape, plotShape3D, getEmptyPlot
 from Calculations.CParachute import CParachute, calculateDiameterVelocityRelationship
 from Calculations.CShapeGenerator import CShapeGenerator
 from Calculations.Air import getAirDensity
-from Calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET
-from Calculations.CoeffInfo import COEFF_VALUES_DEFAULT
+from Calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET, COEFF_VALUES_DEFAULT
 
 import numpy as np
 

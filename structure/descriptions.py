@@ -1,3 +1,13 @@
+PARACHUTE_TYPE_LABELS = {
+    "spherical": "Sferyczny",
+    "flat_disk": "Płaski dysk",
+    "conical": "Stożkowy",
+    "biconical": "Dwustożkowy",
+    "triconical": "Trójstożkowy",
+    "annular": "Pierścieniowy",
+    "cross": "Krzyżowy"
+}
+
 INPUT_DESCRIPTION =  "Sprecyzuj parametry fizyczne oraz środowiskowe dla symulacji. Gęstość powietrza może być zadana bezpośrednio lub wyznaczona wykorzystując parametry środowiskowe misji wpisane do pierwszej kolumny.",
 SIM1_DESCRIPTION = "Wyznacz średnicę czaszy spadochronu wymaganą do osiągnięcia docelowej prędkości opadania. Wartości MIN oraz MAX sterują zakresem prędkości, dla których wykonywane są obliczenia. Wyznaczona średnica spadochronu zostanie użyta w kolejnych sekcjach.",
 SIM2_DESCRIPTION = "Wyznacz obciążenia występujące podczas otwarcia czaszy spadochronu o danej średnicy przy zadanej prędkości opadania. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
@@ -28,7 +38,7 @@ DESCRIPTION_INPUT_PARAMS = {
     "gaccel": "Przyśpieszenie ziemskie mierzone na platformie startowej",
     "dragcoeff": "Współczynnik oporu aerodynamicznego zależny od kształtu spadochronu",
     "draginteg": "Znormalizowana wartość pola pod wykresem siły oporu aerodynamicznego w funkcji czasu (w chwili czasowej otwarcia spadochronu)",
-    "canopytype": "Typ czaszy spadochronu"
+    "canopytype": "Typ czaszy spadochronu. Domyślnie: sferyczny",
 }
 
 DESCRIPTION_SIM1_PARAMS = {

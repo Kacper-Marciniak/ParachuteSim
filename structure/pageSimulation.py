@@ -108,7 +108,7 @@ def serveInputData():
                         ),
                         html.Div([
                             "Kształt spadochronu:",
-                            dcc.Dropdown(id='input-canopytype-dropdown', value=INPUT_PARAMETERS["CANOPY_TYPE"], options=AVAILABLE_CANOPY_TYPES),
+                            dcc.Dropdown(id='input-canopytype-dropdown', value=INPUT_PARAMETERS["CANOPY_TYPE"], options=[{'label': PARACHUTE_TYPE_LABELS[type], 'value': type} for type in AVAILABLE_CANOPY_TYPES]),
                             serveTooltip(DESCRIPTION_INPUT_PARAMS['canopytype'], 'input-canopytype-dropdown'),
                         ], style={
                             "display": "grid",
@@ -575,8 +575,6 @@ def serveShapeGenerator():
             className='shape-container'
         )
 
-from Calculations.CoeffInfo import COEFF_INFO
-
 def serveModalDragCoeffInfo():
     modal = dbc.Modal([
         dbc.ModalHeader(html.H2("Współczynnik oporu aerodynamicznego")),
@@ -585,7 +583,7 @@ def serveModalDragCoeffInfo():
                 [
                     html.H3("Kształt spadochronu"),
                     html.H3("Współczynnik"),
-                ] + [val for row in [(html.B(key), val) for key,val in COEFF_INFO.items()] for val in row],
+                ] + [val for row in [(html.B(PARACHUTE_TYPE_LABELS[key]), val) for key,val in COEFF_INFO.items()] for val in row],
                 style={
                     "display": "grid",
                     "grid-template-columns": "1fr auto",

@@ -289,6 +289,8 @@ def plotShape3D(tPoints: tuple[np.ndarray,np.ndarray,np.ndarray]):
             xaxis=dict(visible=False),
             yaxis=dict(visible=False),
             zaxis=dict(visible=False),
+            aspectmode='data',
+            aspectratio=dict(x=1, y=1, z=1)
         )
     )
 

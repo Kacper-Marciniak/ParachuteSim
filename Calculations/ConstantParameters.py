@@ -9,8 +9,6 @@ COEFF_INFO = {
     "spherical": "0.62 - 0.77",
     "flat_disk": "0.75 - 0.80",
     "conical": "0.75 - 0.90",
-    "biconical": "0.75 - 0.92",
-    "triconical": "0.80 - 0.96",
     "annular": "0.85 - 0.95",
     "cross": "0.60 - 0.85"
 }
@@ -18,9 +16,8 @@ COEFF_INFO = {
 COEFF_VALUES_DEFAULT = {
     "spherical": 0.70,
     "flat_disk": 0.75,
-    "conical": 0.80,
-    "biconical": 0.85,
-    "triconical": 0.90,
+    "conical": 0.80, 
+    "other": 0.70,
 }
 
 AVAILABLE_CANOPY_TYPES = list(COEFF_VALUES_DEFAULT.keys())
@@ -36,3 +33,5 @@ INPUT_PARAMETERS = {
     "OPENING_FORCE_REDUCTION_FACTOR": 0.9, #[-]
     "CANOPY_TYPE": "spherical"
 }
+
+MAX_SUGGESTED_HOLE_TO_DIAMETER_RATIO = 0.35

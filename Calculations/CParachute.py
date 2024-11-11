@@ -5,16 +5,27 @@ Parachute class definition
 from Calculations.ConstantParameters import *
 import numpy as np
 
-def getDiamaterFromVelocity(_TargetVelocity: np.ndarray | float, fMass: float, dcParameters: dict = INPUT_PARAMETERS):
+def getAreaFromVelocity(_TargetVelocity: np.ndarray | float, fMass: float, dcParameters: dict = INPUT_PARAMETERS):
     """
     Get required parachute area for given target velocity
     """
     fEffectiveArea = (2*fMass*dcParameters["G_ACCELERATION"]/(dcParameters["AIR_DENSITY"]*_TargetVelocity**2*dcParameters["DRAG_COEFF"]))
+    return fEffectiveArea
+
+def getDiamaterFromVelocity(_TargetVelocity: np.ndarray | float, fMass: float, dcParameters: dict = INPUT_PARAMETERS, fHoleFactor: float = 0.0):
+    """
+    Get required parachute area for given target velocity
+    """    
+    fAreaMultiplier = 1/(1.0-fHoleFactor) # Calculated parachute area multiplier
+    fTotalArea = getAreaFromVelocity(_TargetVelocity, fMass, dcParameters)*fAreaMultiplier
+    fHoleArea = fTotalArea*fHoleFactor
+
     if dcParameters["CANOPY_TYPE"] in ("spherical", "flat_disk", "conical"):
-        fMaxDiameter = 2*np.sqrt(fEffectiveArea/np.pi)
+        fMaxDiameter = 2*np.sqrt(fTotalArea/np.pi)
+        fHoleDiameter = 2*np.sqrt(fHoleArea/np.pi)
     else:
         raise ValueError("Unsupported canopy type!")
-    return fMaxDiameter
+    return fMaxDiameter, fHoleDiameter
     
 def getVelocityFromDiameter(_MaxDiameter: np.ndarray | float, fMass: float, dcParameters: dict = INPUT_PARAMETERS):
     """
@@ -30,11 +41,12 @@ def calculateDiameterVelocityRelationship(
         fMass: float,
         tTargetVelocityRange: tuple | list = (5, 20),
         iSamples: int = 50,
-        dcParameters: dict = INPUT_PARAMETERS
+        dcParameters: dict = INPUT_PARAMETERS,
+        fHoleFactor: float = 0.0
     ):
     aTargetVelocity = np.linspace(tTargetVelocityRange[0],tTargetVelocityRange[1],iSamples)
-    aDiameters = getDiamaterFromVelocity(aTargetVelocity, fMass, dcParameters)
-    return aTargetVelocity, aDiameters
+    aCanopyDiameters, aHoleDiameters = getDiamaterFromVelocity(aTargetVelocity, fMass, dcParameters, fHoleFactor)
+    return aTargetVelocity, aCanopyDiameters, aHoleDiameters
 
 class CParachute():
 
@@ -42,6 +54,7 @@ class CParachute():
             self,
             fMass: float,
             fCanopyDiameter: float,
+            fHoleDiameter: float,
             fOpenInitVelocity: float,
             dcParameters: dict = INPUT_PARAMETERS    
         ):
@@ -52,11 +65,13 @@ class CParachute():
         self.fMass = fMass
         # Canopy parameters
         self.fCanopyDiameter = fCanopyDiameter
+        self.fHoleDiameter = fHoleDiameter
         self.fCanopyArea = (fCanopyDiameter/2.0)**2*np.pi
+        self.fEffectiveArea = self.fCanopyArea-(fHoleDiameter/2.0)**2*np.pi
         # Velocity
         self.fOpenInitVelocity = fOpenInitVelocity
         # Drag
-        self.fVehicleDragArea = self.dcParameters["DRAG_COEFF"]*self.fCanopyArea
+        self.fVehicleDragArea = self.dcParameters["DRAG_COEFF"]*self.fEffectiveArea
         # Get inflation time
         # t_inf = n*D_0/(V_1**k)
         self.fInflationTime = self.dcParameters["INFLATION_CANOPY_FILL_CONST"]*self.fCanopyDiameter/(self.fOpenInitVelocity**self.dcParameters["DECCELERATION_EXPONENT"])
@@ -87,9 +102,9 @@ class CParachute():
         """
         # Standard non-dimensional inflation time
         # n_inf = t_inf*V_0/S_o
-        fSNFInf = self.fInflationTime * self.fOpenInitVelocity / self.fCanopyArea
+        fSNFInf = self.fInflationTime * self.fOpenInitVelocity / self.fEffectiveArea
         # Generalized non-dimensional inflation time
-        fGNFInf = fSNFInf * self.fCanopyArea * self.dcParameters["DRAG_INTEGRAL"] / np.sqrt(self.fVehicleDragArea)
+        fGNFInf = fSNFInf * self.fEffectiveArea * self.dcParameters["DRAG_INTEGRAL"] / np.sqrt(self.fVehicleDragArea)
         if fGNFInf < 4.0: print(f"Generalized non-dimensional inflation time is too low ({fGNFInf})!")
         # Mass ratio
         # R_m = ro*(C_d*S_o)**(3/2)/m

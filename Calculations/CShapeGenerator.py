@@ -1,13 +1,22 @@
 import numpy as np
 
-class CShapeGenerator():
+def create_closed_symmetrical_contour(aX: np.ndarray, aY: np.ndarray) -> np.ndarray:
+    # Create 2D contour
+    return np.concatenate((
+        np.stack((aX, aY), axis=-1),
+        np.stack((-np.flip(aX), np.flip(aY)), axis=-1),
+        [[aX[0], aY[0]]]
+    ))
+
+class CSphericalGenerator():
 
     def __init__(self, fSpherePercent: float, fDiameter: float, iNumberOfSegments: int = 5, fHoleDiameter: float = 0.0, iNPoints: int = 100):
+        
         self.fSpherePercent = np.clip(fSpherePercent, 0.05, 0.95)
         self.fCanopyDiameter = np.clip(fDiameter, 0.0, None)
         self.iNumberOfSegments = np.clip(iNumberOfSegments, 5, None)
         self.fHoleDiameter = np.clip(fHoleDiameter, 0.0, self.fCanopyDiameter)
-        self.iNPoints = np.clip(iNPoints, 1, 250)
+        self.iNPoints = np.clip(iNPoints, 2, 250)
         
         if self.fSpherePercent < 0.50:
             self.fSphereRadius = self.fCanopyDiameter/(4.0*(self.fSpherePercent-self.fSpherePercent**2)**.5)
@@ -19,7 +28,7 @@ class CShapeGenerator():
         # Spherical coordinates
         # Theta
         self.fThetaStart = np.arcsin(self.fHoleDiameter/(2.0*self.fSphereRadius)) if self.fHoleDiameter > 0.0 else 0.0
-        self.fThetaEnd = np.arccos(1-2*self.fSpherePercent)
+        self.fThetaEnd = np.arccos(1-2.0*self.fSpherePercent)
 
         # Phi
         self.fPhiStart = 0.0
@@ -60,32 +69,93 @@ class CShapeGenerator():
 
         aX, aY = np.array(aX[iIndiceStart:]), np.array(aY[iIndiceStart:])
 
-        # Create 2D contour
-        aContour = np.concatenate((
-            np.stack((aX, aY), axis=-1),
-            np.stack((-np.flip(aX), np.flip(aY)), axis=-1),
-            [[aX[0], aY[0]]]
-        ))
-
-        return aContour
+        return create_closed_symmetrical_contour(aX, aY)
     
-    def getSegmentShape(self):
-        aTheta = np.concatenate((
-            np.linspace(self.fThetaStart, self.fThetaEnd, self.iNPoints),
-            [self.fThetaEnd],
-            np.linspace(self.fThetaEnd, self.fThetaStart, self.iNPoints),
-            [self.fThetaStart, self.fThetaStart]
-        ))
-        aPhi = np.concatenate((
-            np.full(self.iNPoints, self.fPhiEnd/2),
-            [0],
-            np.full(self.iNPoints, -self.fPhiEnd/2),
-            [0, self.fPhiEnd/2]
-        ))
+class CConicalGenerator():
+    
+    def __init__(self, fConeAngle: float, fDiameter: float, iNumberOfSegments: int = 5, fHoleDiameter: float = 0.0):
+        
+        self.fConeAngle = np.deg2rad(np.clip(fConeAngle, 0.0, 180.0))
+        self.fCanopyDiameter = np.clip(fDiameter, 0.0, None)
+        self.iNumberOfSegments = np.clip(iNumberOfSegments, 5, None)
+        self.fHoleDiameter = np.clip(fHoleDiameter, 0.0, self.fCanopyDiameter)
+        self.iNPoints = 2
 
-        aArcsHorizontal = (self.fSphereRadius*np.sin(aTheta))*aPhi
-        aArcsVertical = (self.fSphereRadius*aTheta)
+        # Cylindrical coordinates
+        # Height
+        self.fHeightStart = self.fHoleDiameter/(2.0*np.tan(self.fConeAngle/2)) if self.fHoleDiameter > 0.0 else 0.0
+        self.fHeightEnd = self.fCanopyDiameter/(2.0*np.tan(self.fConeAngle/2))
 
-        aContour = np.stack((aArcsHorizontal, aArcsVertical), axis=-1)
+        # Phi
+        self.fPhiStart = 0.0
+        self.fPhiEnd = 2.0*np.pi/self.iNumberOfSegments
 
-        return aContour
+    def get3DRepresentation(self):
+
+        aHeight = np.linspace(self.fHeightStart,self.fHeightEnd,self.iNPoints)
+        aPhi = np.linspace(0,2.0*np.pi,self.iNumberOfSegments+1)
+
+        u, v = np.meshgrid(aPhi, aHeight)
+
+        aX = np.cos(u) * v * np.tan(self.fConeAngle/2)
+        aY = np.sin(u) * v * np.tan(self.fConeAngle/2)
+        aZ = self.fHeightEnd - v
+
+        return aX, aY, aZ
+    
+    def get2DRepresentation(self):
+
+        aHeight = np.linspace(self.fHeightStart,self.fHeightEnd,self.iNPoints)
+
+        # Chords and segment height
+        aChordsHorizontal = (np.tan(self.fConeAngle/2)*aHeight)*((1-np.cos(self.fPhiEnd))*2)**.5
+        aHeightSegment = aHeight / np.cos(self.fConeAngle/2)
+
+        # Calculate X and Y
+        aX, aY = aChordsHorizontal/2, aHeightSegment
+
+        return create_closed_symmetrical_contour(aX, aY)
+    
+class CDiskGenerator():
+    
+    def __init__(self, fDiameter: float, iNumberOfSegments: int = 5, fHoleDiameter: float = 0.0):
+        
+        self.fCanopyDiameter = np.clip(fDiameter, 0.0, None)
+        self.iNumberOfSegments = np.clip(iNumberOfSegments, 5, None)
+        self.fHoleDiameter = np.clip(fHoleDiameter, 0.0, self.fCanopyDiameter)
+        self.iNPoints = 2
+
+        # Polar coordinates
+        # Radius
+        self.fRadiusStart = self.fHoleDiameter/2 if self.fHoleDiameter > 0.0 else 0.0
+        self.fRadiusEnd = self.fCanopyDiameter/2
+
+        # Phi
+        self.fPhiStart = 0.0
+        self.fPhiEnd = 2.0*np.pi/self.iNumberOfSegments
+
+    def get3DRepresentation(self):
+
+        aRadius = np.linspace(self.fRadiusStart,self.fRadiusEnd,self.iNPoints)
+        aPhi = np.linspace(0,2.0*np.pi,self.iNumberOfSegments+1)
+
+        u, v = np.meshgrid(aPhi, aRadius)
+
+        aX = np.cos(u) * v
+        aY = np.sin(u) * v
+        aZ = np.zeros_like(u)
+
+        return aX, aY, aZ
+    
+    def get2DRepresentation(self):
+
+        aRadius = np.linspace(self.fRadiusStart,self.fRadiusEnd,self.iNPoints)
+
+        # Chords and segment height
+        aChords = aRadius*((1-np.cos(self.fPhiEnd))*2)**.5
+        aHeights = aRadius * np.cos(self.fPhiEnd/2)
+
+        # Calculate X and Y
+        aX, aY = aChords/2, aHeights
+
+        return create_closed_symmetrical_contour(aX, aY)

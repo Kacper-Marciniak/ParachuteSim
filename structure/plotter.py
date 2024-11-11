@@ -28,22 +28,24 @@ def getEmptyPlot():
         }
     }
 
-def plotResults(aXArray: np.ndarray, aYArray: np.ndarray, sXlabel: str = "", sYLabel: str = "", sColour: str = "black", lHorizontalLines: list[tuple] = [], lVerticalLines: list[tuple] = [], bEqualAxis: bool = False):
+def plotResults(lXYData: list, lLabels: list = [""], sXlabel: str = "", sYLabel: str = "", lColours: list = ["black"], lHorizontalLines: list[tuple] = [], lVerticalLines: list[tuple] = [], bEqualAxis: bool = False):
 
     dcFigure = go.Figure()
 
-    dcFigure.add_trace(
-        go.Scatter(
-            x = aXArray, 
-            y = aYArray,
-            line_color=sColour,
-            mode='lines',
-            showlegend=False,
-            hoverinfo='text',
-            hovertemplate="Średnica: %{y:.3f} m<extra></extra>",
-            opacity=0.90,
+    for i,(aXArray,aYArray) in enumerate(lXYData):
+        dcFigure.add_trace(
+            go.Scatter(
+                x = aXArray, 
+                y = aYArray,
+                line_color=lColours[i],
+                mode='lines',
+                showlegend=False,
+                hoverinfo='text',
+                name=lLabels[i],
+                hovertemplate=f"{lLabels[i]}"+": %{y:.3f} m<extra></extra>",
+                opacity=0.90,
+            )
         )
-    )
 
     for fY,sColor in lHorizontalLines:
         dcFigure.add_hline(

@@ -107,6 +107,17 @@ textarea {
     color: black;
 }
 
+.card-alert{
+    background-color: rgba(80, 150, 180, 0.25);
+    border-color: rgba(0, 0, 0, 0);
+    color: black;
+}
+
+.car-info > * , .card-info > * {
+    width: 100%;
+    padding: 5px;
+}
+
 .buttons-container{
     display: grid;
     grid-template-rows: 1fr 1fr;
@@ -130,7 +141,7 @@ textarea {
 .shape-container {
     display: grid;
     grid-template-columns: minmax(400px, 1fr) 2fr 2fr;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto auto;
     gap: 10px;
     align-items: stretch;
     justify-content: space-between;  

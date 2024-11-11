@@ -2,10 +2,9 @@ PARACHUTE_TYPE_LABELS = {
     "spherical": "Sferyczny",
     "flat_disk": "Płaski dysk",
     "conical": "Stożkowy",
-    "biconical": "Dwustożkowy",
-    "triconical": "Trójstożkowy",
     "annular": "Pierścieniowy",
-    "cross": "Krzyżowy"
+    "cross": "Krzyżowy",
+    "other": "Inny",
 }
 
 INPUT_DESCRIPTION =  "Sprecyzuj parametry fizyczne oraz środowiskowe dla symulacji. Gęstość powietrza może być zadana bezpośrednio lub wyznaczona wykorzystując parametry środowiskowe misji wpisane do pierwszej kolumny.",
@@ -46,19 +45,23 @@ DESCRIPTION_SIM1_PARAMS = {
     "velocitystart": "Początek zakresu rozpatrywanych prędkości opadania",
     "velocitystop": "Koniec zakresu rozpatrywanych prędkości opadania",
     "velocity": "Oczekiwana prędkość opadania pojazdu po otwarciu spadochronu",
-    "diameter": "Wyznaczona średnica czaszy spadochronu"
+    "diameter": "Wyznaczona średnica czaszy spadochronu",
+    "holediameter": "Wyznaczona średnica otworu centralnego",
+    "holefactor": "Wielkość otworu centralnego jako ułamek średnicy czaszy spadochronu",
 }
 
 DESCRIPTION_SIM2_PARAMS = {
     "mass" : "Rzeczywista masa pojazdu",
     "velocity": "Prędkość opadania przed otwarciem spadochronu",
-    "diameter": "Efektywna średnica czaszy spadochronu"
+    "diameter": "Średnica czaszy spadochronu",
+    "holediameter": "Średnica otworu centralnego",
 }
 
 DESCRIPTION_GENERATOR_PARAMS = {
     "diameter": "Efektywna średnica czaszy spadochronu",
     "segments": "Liczba segmentów czaszy spadochronu",
-    "spherepercent": "Współczynnik sferyczności czaszy spadochronu, gdzie 0.5 do spadochron półsferyczny",
-    "holediameter": "Średnica otworu w czaszy spadochronu",
-    "points": "Liczba punktów użytych podczas wyznaczania kształtu czaszy spadochronu. Więcej punktów oznacza dokładniejsze odwzorowanie kształtu"
+    "spherepercent": r"Współczynnik sferyczności czaszy spadochronu, gdzie 50% to spadochron półsferyczny",
+    "holediameter": "Średnica otworu centralnego w czaszy spadochronu",
+    "points": "Liczba punktów użytych podczas wyznaczania kształtu czaszy spadochronu. Więcej punktów oznacza dokładniejsze odwzorowanie kształtu",
+    "coneangle": "Kąt rozwarcia stożka czaszy spadochronu (tylko dla czaszy stożkowych).",
 }

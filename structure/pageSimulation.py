@@ -20,12 +20,7 @@ def serveInputData():
                     dbc.CardBody([
                         html.Div(
                             INPUT_DESCRIPTION,
-                            id = "input-description-container",
-                            style={                           
-                                "width": "100%",
-                                "padding": "5px",
-                                "gap": "5px"
-                            }              
+                            id = "input-description-container",           
                         )
                     ], className='card-info'),
                 ], style={
@@ -198,13 +193,7 @@ def serveSim1():
                     dbc.CardBody([
                         html.Div(
                             SIM1_DESCRIPTION,
-                            id = "simulation1-description-container",
-                            style={
-                                
-                                "width": "100%",
-                                "padding": "5px",
-                                "gap": "5px"
-                            }                    
+                            id = "simulation1-description-container",                
                         )
                     ], className='card-info'),
                 ], style={
@@ -229,9 +218,15 @@ def serveSim1():
                             "Oczekiwana prędkość opadania [m/s]:",
                             dcc.Input(type='number', id='simulation1-velocity-input', min=0, step=.1, value=10.0),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['velocity'], 'simulation1-velocity-input'),
-                            "Wyznaczona efektywna średnica czaszy [m]:",
+                            "Powierzchnia otworu centralnego [%]:",
+                            dcc.Input(type='number', id='simulation1-holefactor-input', min=0, max=99, step=1, value=0),
+                            serveTooltip(DESCRIPTION_SIM1_PARAMS['holefactor'], 'simulation1-holefactor-input'),
+                            "Wyznaczona średnica czaszy [m]:",
                             dcc.Input(type='number', id='simulation1-diameter-input', value=0.0, disabled=True),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['diameter'], 'simulation1-diameter-input'),
+                            "Wyznaczona średnica otworu [m]:",
+                            dcc.Input(type='number', id='simulation1-holediameter-input', value=0.0, disabled=True),
+                            serveTooltip(DESCRIPTION_SIM1_PARAMS['holediameter'], 'simulation1-holediameter-input'),
                             "Język etykiet na wykresie:",
                             dcc.RadioItems(['PL', 'EN'], 'EN',  id='simulation1-plotlang-radio', inline=True)
                         ], style={
@@ -325,13 +320,7 @@ def serveSim2():
                     dbc.CardBody([
                         html.Div(
                             SIM2_DESCRIPTION,
-                            id = "simulation2-description-container",
-                            style={
-                                
-                                "width": "100%",
-                                "padding": "5px",
-                                "gap": "5px"
-                            }                    
+                            id = "simulation2-description-container",                  
                         )
                     ], className='card-info'),
                 ], style={
@@ -352,9 +341,12 @@ def serveSim2():
                             "Prędkość przy otwarciu [m/s]:",
                             dcc.Input(type='number', id='simulation2-velocity-input', min=0, step=.1, value=40.0),
                             serveTooltip(DESCRIPTION_SIM2_PARAMS['velocity'], 'simulation2-velocity-input'),
-                            "Efektywna średnica spadochronu [m]:",
+                            "Średnica spadochronu [m]:",
                             dcc.Input(type='number', id='simulation2-diameter-input', min=0, step=.01, value=0.30),
                             serveTooltip(DESCRIPTION_SIM2_PARAMS['diameter'], 'simulation2-diameter-input'),
+                            "Średnica otworu centralnego [m]:",
+                            dcc.Input(type='number', id='simulation2-holediameter-input', min=0, step=.01, value=0.0),
+                            serveTooltip(DESCRIPTION_SIM2_PARAMS['holediameter'], 'simulation2-holediameter-input'),
                         ], style={
                             "display": "grid",
                             "grid-template-columns": "1fr 75px",
@@ -422,7 +414,7 @@ def serveShapeGenerator():
     return html.Div(
             [                
                 html.H2(
-                    "Generator kształtu czaszy spadochronu sferycznego",
+                    "Generator kształtu czaszy spadochronu",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -433,13 +425,7 @@ def serveShapeGenerator():
                     dbc.CardBody([
                         html.Div(
                             GENERATOR_DESCRIPTION,
-                            id = "shapegenerator-description-container",
-                            style={
-                                
-                                "width": "100%",
-                                "padding": "5px",
-                                "gap": "5px"
-                            }                    
+                            id = "shapegenerator-description-container",                    
                         )
                     ], className='card-info'),
                 ], style={
@@ -460,14 +446,17 @@ def serveShapeGenerator():
                             "Liczba segmentów [-]:",
                             dcc.Input(type='number', id='shapegenerator-segments-input', min=5, step=1, value=8),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['segments'], 'shapegenerator-segments-input'),
-                            "Współczynnik sferyczności [-]:",
-                            dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=0.05, max=.95, step=.01, value=0.5),
+                            "Współczynnik sferyczności [%]:",
+                            dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=5, max=95, step=1, value=50),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['spherepercent'], 'shapegenerator-spherepercent-input'),
-                            "Średnica górnego otworu [m]:",
+                            "Kąt rozwarcia stożka [deg]:",
+                            dcc.Input(type='number', id='shapegenerator-coneangle-input', min=1, max=179, step=1, value=135),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['coneangle'], 'shapegenerator-coneangle-input'),
+                            "Średnica centralnego otworu [m]:",
                             dcc.Input(type='number', id='shapegenerator-holediameter-input', min=0, step=.01, value=0),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['holediameter'], 'shapegenerator-holediameter-input'),
                             "Liczba punktów [-]:",
-                            dcc.Input(type='number', id='shapegenerator-points-input', min=5, max=250, step=1, value=15),
+                            dcc.Input(type='number', id='shapegenerator-points-input', min=2, max=250, step=1, value=15),
                             serveTooltip(DESCRIPTION_GENERATOR_PARAMS['points'], 'shapegenerator-points-input'),
                         ], style={
                             "display": "grid",
@@ -537,7 +526,7 @@ def serveShapeGenerator():
                         )
                     ]),
                 ], style={
-                    'grid-row': '3/-1',
+                    'grid-row': '3/5',
                     'grid-column': '2',
                     'height': '100%'
                 }),
@@ -567,10 +556,21 @@ def serveShapeGenerator():
                         )
                     ]),
                 ], style={
-                    'grid-row': '3/-1',
+                    'grid-row': '3/5',
                     'grid-column': '3',
                     'height': '100%'
                 }),
+                dbc.Card([
+                    dbc.CardBody(
+                    [],
+                    className='card-info',
+                    id = "shapegenerator-alert-container",
+                    ),
+                ], style={
+                    'grid-row': '5',
+                    'grid-column': '1/-1',
+                    'height': '100%'
+                }, className='card-alert'),
             ],
             className='shape-container'
         )

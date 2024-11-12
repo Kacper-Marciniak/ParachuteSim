@@ -7,10 +7,10 @@ PARACHUTE_TYPE_LABELS = {
     "other": "Inny",
 }
 
-INPUT_DESCRIPTION =  "Sprecyzuj parametry fizyczne oraz środowiskowe dla symulacji. Gęstość powietrza może być zadana bezpośrednio lub wyznaczona wykorzystując parametry środowiskowe misji wpisane do pierwszej kolumny.",
-SIM1_DESCRIPTION = "Wyznacz średnicę czaszy spadochronu wymaganą do osiągnięcia docelowej prędkości opadania. Wartości MIN oraz MAX sterują zakresem prędkości, dla których wykonywane są obliczenia. Wyznaczona średnica spadochronu zostanie użyta w kolejnych sekcjach.",
-SIM2_DESCRIPTION = "Wyznacz obciążenia występujące podczas otwarcia czaszy spadochronu o danej średnicy przy zadanej prędkości opadania. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
-GENERATOR_DESCRIPTION = "Wyznacz kształt segmentów czaszy spadochronu. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
+INPUT_DESCRIPTION =  "ℹ️ Sprecyzuj parametry fizyczne oraz środowiskowe dla symulacji. Gęstość powietrza może być zadana bezpośrednio lub wyznaczona wykorzystując parametry środowiskowe misji wpisane do pierwszej kolumny.",
+SIM1_DESCRIPTION = "ℹ️ Wyznacz średnicę czaszy spadochronu wymaganą do osiągnięcia docelowej prędkości opadania. Wartości MIN oraz MAX sterują zakresem prędkości, dla których wykonywane są obliczenia. Wyznaczona średnica spadochronu zostanie użyta w kolejnych sekcjach.",
+SIM2_DESCRIPTION = "ℹ️ Wyznacz obciążenia występujące podczas otwarcia czaszy spadochronu o danej średnicy przy zadanej prędkości opadania. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
+GENERATOR_DESCRIPTION = "ℹ️ Wyznacz kształt segmentów czaszy spadochronu. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
 INPUT_PARAMETERS_DESCRIPTION = """PARAMETRY GŁÓWNE
 
 Gęstość powietrza - wartość w kg/m^3 na wysokości otwarcia spadochronu. Do wpisania bezpośrednio lub wyznaczana przy użyciu dodatkowego modułu.

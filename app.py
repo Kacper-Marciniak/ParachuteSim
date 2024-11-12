@@ -459,7 +459,7 @@ def callback(dcParameters: dict):
             dcStyle = {
                 "background-color": "rgba(25, 200, 25, 0.40)",
             }
-            sText = f"[{PARACHUTE_TYPE_LABELS[sCanopyType]}] Wprowadź parametry czaszy spadochronu i uruchom symulację"
+            sText = f"[Typ: {PARACHUTE_TYPE_LABELS[sCanopyType].lower()}] Wprowadź parametry czaszy spadochronu i uruchom symulację"
         
         else:
             raise Exception("Nieobsługiwany typ czaszy spadochronu")

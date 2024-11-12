@@ -3,13 +3,13 @@ import dash_bootstrap_components as dbc
 from structure.plotter import getEmptyPlot
 from structure.descriptions import *
 from Calculations.ConstantParameters import *
-from structure.baseElements import serveTooltip, BASE_COLOR
+from structure.baseElements import serveTooltip
 
 def serveInputData():
     return html.Div(
             [                
                 html.H2(
-                    "Podstawowe parametry symulacji",
+                    "I Podstawowe parametry symulacji",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -125,24 +125,12 @@ def serveInputData():
                         dbc.Button(
                             "Przelicz",
                             id="input-run-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                         dbc.Button(
                             "💾 Zapisz CSV",
                             id="input-save-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ],
                     className='buttons-container'
@@ -160,13 +148,7 @@ def serveInputData():
                         dbc.Button(
                             "Współczynnik oporu aerodynamicznego - informacje",
                             id="input-dragcoeffinfo-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ]),
                 ], style={
@@ -182,7 +164,7 @@ def serveSim1():
     return html.Div(
             [                
                 html.H2(
-                    "Wymagana efektywna średnica czaszy spadochronu",
+                    "II Wymagana efektywna średnica czaszy spadochronu",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -219,7 +201,7 @@ def serveSim1():
                             dcc.Input(type='number', id='simulation1-velocity-input', min=0, step=.1, value=10.0),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['velocity'], 'simulation1-velocity-input'),
                             "Powierzchnia otworu centralnego [%]:",
-                            dcc.Input(type='number', id='simulation1-holefactor-input', min=0, max=99, step=1, value=0),
+                            dcc.Input(type='number', id='simulation1-holefactor-input', min=0, max=99, step=0.5, value=0),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['holefactor'], 'simulation1-holefactor-input'),
                             "Wyznaczona średnica czaszy [m]:",
                             dcc.Input(type='number', id='simulation1-diameter-input', value=0.0, disabled=True),
@@ -249,24 +231,12 @@ def serveSim1():
                         dbc.Button(
                             "Przelicz",
                             id="simulation1-run-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                         dbc.Button(
                             "💾 Zapisz CSV",
                             id="simulation1-save-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ],
                     className='buttons-container'
@@ -309,7 +279,7 @@ def serveSim2():
     return html.Div(
             [                
                 html.H2(
-                    "Obciążenia przy otwarciu spadochronu",
+                    "III Obciążenia przy otwarciu spadochronu",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -367,24 +337,12 @@ def serveSim2():
                         dbc.Button(
                             "Przelicz",
                             id="simulation2-run-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                         dbc.Button(
                             "💾 Zapisz CSV",
                             id="simulation2-save-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ],
                     className='buttons-container'
@@ -414,7 +372,7 @@ def serveShapeGenerator():
     return html.Div(
             [                
                 html.H2(
-                    "Generator kształtu czaszy spadochronu",
+                    "IV Generator kształtu czaszy spadochronu",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -478,24 +436,12 @@ def serveShapeGenerator():
                         dbc.Button(
                             "Przelicz",
                             id="shapegenerator-run-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                         dbc.Button(
                             "💾 Zapisz DXF",
                             id="shapegenerator-save-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ],
                     className='buttons-container'

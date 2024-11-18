@@ -5,12 +5,18 @@ from dash.dependencies import Input, Output, State
 import webbrowser
 import pandas as pd
 import datetime
+import ezdxf
+from ezdxf import units
+import os
 
-from structure.page import serveSim1, serveSim2, serveNavbar, serveFooter, serveInputData
-from structure.plotter import plotResults, getEmptyPlot
+from structure.pageSimulation import serveSim1, serveSim2, serveInputData, serveShapeGenerator, serveModalDragCoeffInfo
+from structure.baseElements import serveNavbar, serveFooter
+from structure.plotter import plotResults, plotShape, plotShape3D, getEmptyPlot
 from Calculations.CParachute import CParachute, calculateDiameterVelocityRelationship
+from Calculations.CShapeGenerator import CSphericalGenerator, CConicalGenerator, CDiskGenerator
 from Calculations.Air import getAirDensity
-from Calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET
+from Calculations.ConstantParameters import INPUT_PARAMETERS, KELVIN_OFFSET, COEFF_VALUES_DEFAULT, MAX_SUGGESTED_HOLE_TO_DIAMETER_RATIO
+from structure.descriptions import PARACHUTE_TYPE_LABELS
 
 import numpy as np
 
@@ -32,9 +38,11 @@ def _serve_layout():
         dcc.Store('input-parameters-store', storage_type='session', data=INPUT_PARAMETERS),
         dcc.Store('simulation1-results-store', storage_type='session', data={}),
         dcc.Store('simulation2-results-store', storage_type='session', data={}),
+        dcc.Store('shapegenerator-results-store', storage_type='session', data=[]),
         dcc.Download('airdensity-results-download'),
         dcc.Download('simulation1-results-download'),
-        dcc.Download('simulation2-results-download')
+        dcc.Download('simulation2-results-download'),
+        dcc.Download('shapegenerator-results-download')
     ])
 
 # Update displayed page
@@ -46,10 +54,16 @@ def display_page(sUrl: str | None):
     return html.Div(
         [
             serveNavbar(),
-            serveInputData(),
-            serveSim1(),
-            serveSim2(),
-            serveFooter(),            
+            html.Div([
+                serveInputData(),
+                serveSim1(),
+                serveSim2(),
+                serveShapeGenerator(),
+                ],
+                className='page-content-body'
+            ),
+            serveFooter(),
+            serveModalDragCoeffInfo()
         ],
         className='page-content'
     )
@@ -96,6 +110,22 @@ def callback(fRefPressure: float, fRefTemp: float, fHeight: float, fHumidity: fl
     return no_update, no_update, no_update, no_update, {}
 
 @app.callback(
+    Output('input-dragcoeff-input', 'value'),
+    Output('input-dragcoeff-input', 'style'),
+    Output('input-canopytype-dropdown', 'style'),
+    Input('input-canopytype-dropdown', 'value'),
+    Input('input-dragcoeff-input', 'value'),
+)
+def callback(sCanopyType: str, _ValDragCoeff):
+    sTrigger = callback_context.triggered_id
+    if sCanopyType in COEFF_VALUES_DEFAULT and sTrigger == 'input-canopytype-dropdown':
+        return COEFF_VALUES_DEFAULT[sCanopyType], {"background-color": "rgba(225,225,0, 0.5)"}, {"background-color": "rgba(225,225,0, 0.5)"}
+    elif sTrigger == 'input-dragcoeff-input':
+        return no_update, {"background-color": "rgba(255,255,255, 1)"}, {"background-color": "rgba(255,255,255, 1)"}
+    else:
+        return no_update, no_update, no_update
+
+@app.callback(
     Output('input-parameters-store', 'data'),
     Input('input-airdensity-input', 'value'),
     Input('input-gaccel-input', 'value'),
@@ -105,9 +135,10 @@ def callback(fRefPressure: float, fRefTemp: float, fHeight: float, fHumidity: fl
     Input('input-fillconst-input', 'value'),
     Input('input-deccel-input', 'value'),
     Input('input-draginteg-input', 'value'),
+    Input('input-canopytype-dropdown', 'value'),
     State('input-parameters-store', 'data')
 )
-def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFactor: float, fForceReduction: float, fFillConst: float, fDeccelExp: float, fDragInteg: float, dcStore: dict):
+def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFactor: float, fForceReduction: float, fFillConst: float, fDeccelExp: float, fDragInteg: float, sCanopyType: str, dcStore: dict):
     dcStore["AIR_DENSITY"] = fAirDensity
     dcStore["DRAG_COEFF"] = fDragCoeff
     dcStore["G_ACCELERATION"] = fGAccel
@@ -116,11 +147,13 @@ def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFacto
     dcStore["INFLATION_CANOPY_FILL_CONST"] = fFillConst
     dcStore["DECCELERATION_EXPONENT"] = fDeccelExp
     dcStore["DRAG_INTEGRAL"] = fDragInteg
+    dcStore["CANOPY_TYPE"] = sCanopyType
     return dcStore
 
 @app.callback(
     Output('simulation1-results-plot', 'figure'),
     Output('simulation1-diameter-input', 'value'),
+    Output('simulation1-holediameter-input', 'value'),
     Output('simulation1-results-store', 'data'),
     State('simulation1-mass-input', 'value'),
     State('simulation1-velocity-input', 'value'),
@@ -128,21 +161,27 @@ def callback(fAirDensity: float, fGAccel: float, fDragCoeff: float, fSchockFacto
     State('simulation1-velocitystop-input', 'value'),
     State('input-parameters-store', 'data'),
     State('simulation1-plotlang-radio', 'value'),
+    State('simulation1-holefactor-input', 'value'),
     Input('simulation1-run-button', 'n_clicks')
 )
-def callback(fMass: float, fVelocity: float, fVelocityStart: float, fVelocityStop: float, dcParameters: dict, sLanguage: str, _Button):
+def callback(fMass: float, fVelocity: float, fVelocityStart: float, fVelocityStop: float, dcParameters: dict, sLanguage: str, fHoleFactor: float, _Button):
     if _Button:
         try:
             bIsPL = sLanguage=="PL"
-            aVelocity, aDiameters = calculateDiameterVelocityRelationship(
+            
+            fHoleFactor /= 100.0
+
+            aVelocity, aDiameters, aHoleDiameters = calculateDiameterVelocityRelationship(
                 fMass=fMass,
                 tTargetVelocityRange=(fVelocityStart, fVelocityStop),
                 iSamples=100,
-                dcParameters=dcParameters
+                dcParameters=dcParameters,
+                fHoleFactor=fHoleFactor
             )
 
             fVelocity = aVelocity[np.argmin(np.abs(aVelocity-fVelocity))]
             fDiameter = aDiameters[np.argmin(np.abs(aVelocity-fVelocity))]
+            fHoleDiameter = aHoleDiameters[np.argmin(np.abs(aVelocity-fVelocity))]
             
             dcData = {
                 "Masa pojazdu [kg]": fMass,
@@ -151,15 +190,16 @@ def callback(fMass: float, fVelocity: float, fVelocityStart: float, fVelocitySto
             }
 
             return plotResults(
-                aVelocity, aDiameters, 
-                sColour="black", 
+                [(aVelocity, aDiameters), (aVelocity, aHoleDiameters)] if fHoleFactor != 0.0 else [(aVelocity, aDiameters)],
+                lColours= ['black', 'royalblue'] if fHoleFactor != 0.0 else ['black'],
+                lLabels= ["Średnica czaszy", "Średnica otworu"] if fHoleFactor != 0.0 else ["Średnica czaszy"],
                 sXlabel="Docelowa prędkość opadania [m/s]" if bIsPL else "Target descent velocity [m/s]", 
-                sYLabel="Średnica czaszy [m]" if bIsPL else "Canopy diameter [m]", 
+                sYLabel="Średnica [m]" if bIsPL else "Diameter [m]", 
                 lHorizontalLines=[(fDiameter,'crimson')], lVerticalLines=[(fVelocity,'crimson')]
-            ), np.round(fDiameter,2), dcData
+            ), np.round(fDiameter,2), np.round(fHoleDiameter,2), dcData
         except Exception as E:
             print(E)
-    return getEmptyPlot(), 0.0, {}
+    return getEmptyPlot(), 0.0, 0.0, {}
 
 
 @app.callback(
@@ -168,15 +208,17 @@ def callback(fMass: float, fVelocity: float, fVelocityStart: float, fVelocitySto
     State('simulation2-mass-input', 'value'),
     State('simulation2-velocity-input', 'value'),
     State('simulation2-diameter-input', 'value'),
+    State('simulation2-holediameter-input', 'value'),
     State('input-parameters-store', 'data'),
     Input('simulation2-run-button', 'n_clicks')
 )
-def callback(fMass: float, fVelocity: float, fDiameter: float, dcParameters: dict, _Button):
+def callback(fMass: float, fVelocity: float, fDiameter: float, fHoleDiameter: float, dcParameters: dict, _Button):
 
     if _Button:
         try:
             cParachute = CParachute(
                 fCanopyDiameter = fDiameter,
+                fHoleDiameter = fHoleDiameter,
                 fOpenInitVelocity = fVelocity,
                 fMass = fMass,
                 dcParameters = dcParameters,
@@ -188,6 +230,7 @@ def callback(fMass: float, fVelocity: float, fDiameter: float, dcParameters: dic
     f"""Masa pojazdu: {cParachute.fMass} kg.
 Prędkość przy otwarciu: {round(cParachute.fOpenInitVelocity,3)} m/s.
 Średnica czaszy spadochronu: {round(cParachute.fCanopyDiameter,3)} m.
+Średnica otworu centralnego: {round(cParachute.fHoleDiameter,3)} m.
 Czas napełniania czaszy: {round(cParachute.fInflationTime,3)} s.
 Parametr balistyczny: {round(fBallisticParam,3)}.
 Szczytowe obciążenie przy otwarciu:
@@ -198,6 +241,7 @@ Szczytowe obciążenie przy otwarciu:
                 "Masa pojazdu [kg]": cParachute.fMass,
                 "Prędkość przy otwarciu [m/s]": round(cParachute.fOpenInitVelocity,3),
                 "Średnica czaszy spadochronu [m]": round(cParachute.fCanopyDiameter,3),
+                "Średnica otworu centralnego [m]": round(cParachute.fHoleDiameter,3),
                 "Czas napełniania czaszy [s]": round(cParachute.fInflationTime,3),
                 "Parametr balistyczny [-]": round(fBallisticParam,3),
                 "Szczytowe obciążenie (Pflanz) [N]": round(dcDataLoad['pflanz'],1),
@@ -209,6 +253,44 @@ Szczytowe obciążenie przy otwarciu:
     
     return "Brak danych", {}
     
+@app.callback(
+    Output('shapegenerator-results-plot', 'figure'),    
+    Output('shapegenerator-results2-plot', 'figure'),    
+    Output('shapegenerator-results-store', 'data'),
+    State('shapegenerator-diameter-input', 'value'),
+    State('shapegenerator-segments-input', 'value'),
+    State('shapegenerator-spherepercent-input', 'value'),
+    State('shapegenerator-points-input', 'value'),
+    State('shapegenerator-holediameter-input', 'value'),
+    State('shapegenerator-coneangle-input', 'value'),
+    State('input-parameters-store', 'data'),
+    Input('shapegenerator-run-button', 'n_clicks')
+)
+def callback(fDiameter: float, iSegments: int, fSpherePercent: float, iNPoints: int, fHoleDiameter: float, fConeAngle:float, dcParameters: dict, _Button):
+    if _Button:
+        try:
+            fSpherePercent /= 100.0
+            sCanopyType = dcParameters["CANOPY_TYPE"]
+            if sCanopyType == "spherical":
+                cGenerator = CSphericalGenerator(fSpherePercent, fDiameter, iSegments, fHoleDiameter, iNPoints)
+            elif sCanopyType in ("conical","biconical","triconical"):
+                cGenerator = CConicalGenerator(fConeAngle, fDiameter, iSegments, fHoleDiameter)
+            elif sCanopyType == "flat_disk":
+                cGenerator = CDiskGenerator(fDiameter, iSegments, fHoleDiameter)
+            else:
+                raise ValueError("Nieobsługiwany typ czaszy spadochronu")
+
+            aContour = cGenerator.get2DRepresentation()
+
+            return plotShape(
+                aContour[:,1], aContour[:,0], 
+                sColour="black"
+            ), plotShape3D(
+                cGenerator.get3DRepresentation()
+            ), aContour.tolist()
+        except Exception as E:
+            print(E)
+    return getEmptyPlot(), getEmptyPlot(), []
 
 @app.callback(
     Output('simulation1-mass-input', 'value'),
@@ -233,21 +315,36 @@ def callback(fMass1: float, fMass2: float):
 
 @app.callback(
     Output('simulation2-diameter-input', 'value'),
-    Output('simulation2-diameter-input', 'style'),
+    Output('shapegenerator-diameter-input', 'value'),
+
+    Output('simulation2-holediameter-input', 'value'),
+    Output('shapegenerator-holediameter-input', 'value'),
+
     Output('simulation1-diameter-input', 'style'),
+    Output('simulation2-diameter-input', 'style'),
+    Output('shapegenerator-diameter-input', 'style'),
+    Output('simulation1-holediameter-input', 'style'),
+    Output('simulation2-holediameter-input', 'style'),
+    Output('shapegenerator-holediameter-input', 'style'),
+
     Input('simulation1-diameter-input', 'value'),
-    Input('simulation2-diameter-input', 'value')
+    Input('simulation1-holediameter-input', 'value'),
+
+    Input('simulation2-diameter-input', 'value'),
+    Input('shapegenerator-diameter-input', 'value'),
+    Input('simulation2-holediameter-input', 'value'),
+    Input('shapegenerator-holediameter-input', 'value')
 )
-def callback(fDiameter: float, _Sim2Val):
+def callback(fDiameter: float, fHoleDiameter: float, _Sim2Val, _GenVal, _Sim2ValH, _GenValH):
     sTrigger = callback_context.triggered_id
     if sTrigger == 'simulation1-diameter-input':
         dcStyle = {"background-color": "rgba(75,225,25, 0.5)"} if fDiameter>0.0 else {"background-color": "white"}
-        return fDiameter, dcStyle, dcStyle
-    elif sTrigger == 'simulation2-diameter-input':
+        return fDiameter, fDiameter, fHoleDiameter, fHoleDiameter, dcStyle, dcStyle, dcStyle, dcStyle, dcStyle, dcStyle
+    elif sTrigger in ('simulation2-diameter-input','shapegenerator-diameter-input','simulation2-holediameter-input','shapegenerator-holediameter-input'):
         dcStyle = {"background-color": "white"}
-        return no_update, dcStyle, dcStyle
+        return no_update, no_update, no_update, no_update, dcStyle, dcStyle, dcStyle, dcStyle, dcStyle, dcStyle
     else:
-        return no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update
 
 
 @app.callback(
@@ -298,6 +395,92 @@ def callback(dcData: dict, _Button):
             print(E)  
     return no_update
 
+@app.callback(
+    Output('shapegenerator-results-download', 'data'),
+    State('shapegenerator-results-store', 'data'),
+    Input('shapegenerator-save-button', 'n_clicks')
+)
+def callback(lData: list, _Button):
+
+    if _Button:
+        try:
+            sName = 'parachute_{}.dxf'.format(datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+            _Dxf = ezdxf.new('R2000')
+            _Dxf.header['$MEASUREMENT'] = 1
+            _Dxf.units = units.M
+            _Dxf.layers.new(name="parachute", dxfattribs={"color": 0})
+            msp = _Dxf.modelspace()
+            msp.add_polyline2d(lData, dxfattribs={"layer": "parachute", "lineweight": 20})
+
+            _Dxf.saveas(sName)
+            with open(sName, 'r') as f:
+                content = f.read()
+
+            os.remove(sName)
+
+            return dict(content=content, filename=sName)
+        except Exception as E: 
+            print(E)  
+    return no_update
+
+@app.callback(
+    Output('shapegenerator-spherepercent-input', 'disabled'),
+    Output('shapegenerator-coneangle-input', 'disabled'),
+    Output('shapegenerator-points-input', 'disabled'),
+    Output('shapegenerator-run-button', 'disabled'),
+    Output('shapegenerator-save-button', 'disabled'),
+    Input('input-parameters-store', 'data')
+)
+def callback(dcParameters: dict):
+
+    sCanopyType = dcParameters["CANOPY_TYPE"]
+
+    if sCanopyType == "spherical":
+        return False, True, False, False, False
+    elif sCanopyType == "conical":
+        return True, False, True, False, False
+    elif sCanopyType == "flat_disk":
+        return True, True, True, False, False
+    else: # "flat_disk"
+        return True, True, True, True, True
+    
+
+@app.callback(
+    Output('shapegenerator-alert-container', 'style'),
+    Output('shapegenerator-alert-container', 'children'),
+    Input('input-parameters-store', 'data'),
+)
+def callback(dcParameters: dict):
+    
+    sCanopyType = dcParameters["CANOPY_TYPE"]
+
+    try:
+        if sCanopyType in ("conical","spherical","flat_disk"):
+            dcStyle = {
+                "background-color": "rgba(25, 200, 25, 0.40)",
+            }
+            sText = f"[Typ: {PARACHUTE_TYPE_LABELS[sCanopyType].lower()}] Wprowadź parametry czaszy spadochronu i uruchom symulację"
+        
+        else:
+            raise Exception("Nieobsługiwany typ czaszy spadochronu")
+    
+    except Exception as e:
+        dcStyle = {
+            "background-color": "rgba(200, 25, 25, 0.40)",
+        }
+        sText = str(e)
+
+    return dcStyle, html.Div(sText)
+
+@app.callback(
+    Output('modal-dragcoeffinfo', 'is_open'),
+    Input('input-dragcoeffinfo-button', 'n_clicks')
+)
+def callback(_Button):
+    if _Button:
+        return True
+    else:    
+        return no_update
 
 if __name__ == '__main__':
     webbrowser.open(r'http://127.0.0.1:8080', new=2)

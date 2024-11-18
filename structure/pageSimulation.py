@@ -3,108 +3,13 @@ import dash_bootstrap_components as dbc
 from structure.plotter import getEmptyPlot
 from structure.descriptions import *
 from Calculations.ConstantParameters import *
-
-APP_VERSION = '1.2'
-APP_YEAR = '2024'
-BASE_COLOR = '#008ede'
-
-def serveTooltip(sMessage: str, sTarget: str, sPlacement: str='top'):
-    return dbc.Tooltip(
-        sMessage,
-        target = sTarget,
-        placement = sPlacement,
-        style = {
-            "font-size": "16px",
-        }         
-    )
-
-def serveNavbar():
-    navbar = dbc.Navbar([
-        html.Div([
-            html.Div(
-                [
-                    html.A(html.Img(src=r"assets\logo_pwr.png", height="50px"), href=r'https://pwr.edu.pl/', className='logo-navbar'),
-                    html.A(html.Img(src=r"assets\logo2.png", height="50px"), href=r'https://pwrinspace.pwr.edu.pl/', className='logo-navbar'),
-                ], 
-                style={
-                    "display": "flex",
-                    "flex-direction": "row",
-                    "justify-content": "start",
-                    "align-items": "center",
-                    "gap": "5px",
-                    "width": "100%"
-                }
-            ),
-            html.Div(
-                [
-                    html.H1("ParaSim", style={"color": BASE_COLOR}),
-                    html.Img(src=r"assets\app_shadow.png", height="50px"),
-                ], 
-                style={
-                    "display": "flex",
-                    "flex-direction": "row",
-                    "justify-content": "center",
-                    "align-items": "center",
-                    "gap": "5px",
-                    "width": "100%"
-                }
-            ),
-            html.Div(
-                [
-                    html.A(html.Img(src=r"assets\logo_github.png", height="50px"), href=r'https://github.com/Kacper-Marciniak', className='logo-navbar'),
-                ], 
-                style={
-                    "display": "flex",
-                    "flex-direction": "row",
-                    "justify-content": "end",
-                    "align-items": "center",
-                    "gap": "5px",
-                    "width": "100%"
-                }
-            ),
-
-        ], style={
-                "display": "grid",
-                "grid-template-columns": "1fr auto 1fr",
-                "width": "100%",
-                "height": "100%",
-                "justify-content": "space-between",
-                "align-items": "center",
-                "padding": "0 10px 0 10px"
-            }
-        )
-    ], 
-    className= 'card-footer',
-    style={'height': '75px'},
-    sticky='top'
-    )
-    return navbar
-
-def serveFooter():
-    navbar = html.Footer([
-        html.Div([
-            html.P(f"ParaSim v.{APP_VERSION}", className='footer-text'),
-            html.P(APP_YEAR, className='footer-text'),
-        ], style={
-                "display": "flex",
-                "flex-direction": "column",
-                "width": "100%",
-                "height": "100%",
-                "justify-content": "space-around",
-                "align-items": "center"
-            }
-        )
-    ], 
-    className= 'card-footer',
-    style={'height': '50px'}
-    )
-    return navbar
+from structure.baseElements import serveTooltip
 
 def serveInputData():
     return html.Div(
             [                
                 html.H2(
-                    "Podstawowe parametry symulacji",
+                    "I Podstawowe parametry symulacji",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -115,12 +20,7 @@ def serveInputData():
                     dbc.CardBody([
                         html.Div(
                             INPUT_DESCRIPTION,
-                            id = "input-description-container",
-                            style={                           
-                                "width": "100%",
-                                "padding": "5px",
-                                "gap": "5px"
-                            }              
+                            id = "input-description-container",           
                         )
                     ], className='card-info'),
                 ], style={
@@ -183,6 +83,7 @@ def serveInputData():
                             serveTooltip(DESCRIPTION_INPUT_PARAMS['dragcoeff'], 'input-dragcoeff-input'),
                             "Całka oporu aerodynamicznego [-]:",
                             dcc.Input(type='number', id='input-draginteg-input', min=0, step=.001, value=INPUT_PARAMETERS["DRAG_INTEGRAL"]),
+                            serveTooltip(DESCRIPTION_INPUT_PARAMS['draginteg'], 'input-draginteg-input'),
                             "Współczynnik wstrząsu przy otwarciu [-]:",
                             dcc.Input(type='number', id='input-schockfactor-input', min=0, step=.001, value=INPUT_PARAMETERS["OPENING_LOAD_SHOCK_FACTOR"]),
                             "Współczynnik redukcji siły przy otwarciu [-]:",
@@ -198,8 +99,21 @@ def serveInputData():
                             "gap": "5px",
                             "text-align": "right",
                             "padding": "5px"
+                        }                        
+                        ),
+                        html.Div([
+                            "Kształt spadochronu:",
+                            dcc.Dropdown(id='input-canopytype-dropdown', value=INPUT_PARAMETERS["CANOPY_TYPE"], options=[{'label': PARACHUTE_TYPE_LABELS[type], 'value': type} for type in AVAILABLE_CANOPY_TYPES]),
+                            serveTooltip(DESCRIPTION_INPUT_PARAMS['canopytype'], 'input-canopytype-dropdown'),
+                        ], style={
+                            "display": "grid",
+                            "grid-template-columns": "auto 1fr",
+                            "width": "100%",
+                            "gap": "5px",
+                            "padding": "5px"
                         }
                         )
+                        
                     ]),
                 ], style={
                     'grid-row': '3/-1',
@@ -211,24 +125,12 @@ def serveInputData():
                         dbc.Button(
                             "Przelicz",
                             id="input-run-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                         dbc.Button(
-                            "💾 Zapisz",
+                            "💾 Zapisz CSV",
                             id="input-save-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ],
                     className='buttons-container'
@@ -242,7 +144,12 @@ def serveInputData():
                                 "width": "100%",
                                 "padding": "5px"
                             }                    
-                        )
+                        ),
+                        dbc.Button(
+                            "Współczynnik oporu aerodynamicznego - informacje",
+                            id="input-dragcoeffinfo-button",
+                            class_name='button'
+                        ),
                     ]),
                 ], style={
                     'grid-row': '3/-1',
@@ -257,7 +164,7 @@ def serveSim1():
     return html.Div(
             [                
                 html.H2(
-                    "Wymagana średnica czaszy spadochronu",
+                    "II Wymagana efektywna średnica czaszy spadochronu",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -268,13 +175,7 @@ def serveSim1():
                     dbc.CardBody([
                         html.Div(
                             SIM1_DESCRIPTION,
-                            id = "simulation1-description-container",
-                            style={
-                                
-                                "width": "100%",
-                                "padding": "5px",
-                                "gap": "5px"
-                            }                    
+                            id = "simulation1-description-container",                
                         )
                     ], className='card-info'),
                 ], style={
@@ -299,9 +200,15 @@ def serveSim1():
                             "Oczekiwana prędkość opadania [m/s]:",
                             dcc.Input(type='number', id='simulation1-velocity-input', min=0, step=.1, value=10.0),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['velocity'], 'simulation1-velocity-input'),
+                            "Powierzchnia otworu centralnego [%]:",
+                            dcc.Input(type='number', id='simulation1-holefactor-input', min=0, max=99, step=0.5, value=0),
+                            serveTooltip(DESCRIPTION_SIM1_PARAMS['holefactor'], 'simulation1-holefactor-input'),
                             "Wyznaczona średnica czaszy [m]:",
                             dcc.Input(type='number', id='simulation1-diameter-input', value=0.0, disabled=True),
                             serveTooltip(DESCRIPTION_SIM1_PARAMS['diameter'], 'simulation1-diameter-input'),
+                            "Wyznaczona średnica otworu [m]:",
+                            dcc.Input(type='number', id='simulation1-holediameter-input', value=0.0, disabled=True),
+                            serveTooltip(DESCRIPTION_SIM1_PARAMS['holediameter'], 'simulation1-holediameter-input'),
                             "Język etykiet na wykresie:",
                             dcc.RadioItems(['PL', 'EN'], 'EN',  id='simulation1-plotlang-radio', inline=True)
                         ], style={
@@ -324,24 +231,12 @@ def serveSim1():
                         dbc.Button(
                             "Przelicz",
                             id="simulation1-run-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                         dbc.Button(
-                            "💾 Zapisz",
+                            "💾 Zapisz CSV",
                             id="simulation1-save-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ],
                     className='buttons-container'
@@ -384,7 +279,7 @@ def serveSim2():
     return html.Div(
             [                
                 html.H2(
-                    "Obciążenia przy otwarciu spadochronu",
+                    "III Obciążenia przy otwarciu spadochronu",
                     style = {
                         'grid-row': '1',
                         'grid-column': '1/-1',
@@ -395,13 +290,7 @@ def serveSim2():
                     dbc.CardBody([
                         html.Div(
                             SIM2_DESCRIPTION,
-                            id = "simulation2-description-container",
-                            style={
-                                
-                                "width": "100%",
-                                "padding": "5px",
-                                "gap": "5px"
-                            }                    
+                            id = "simulation2-description-container",                  
                         )
                     ], className='card-info'),
                 ], style={
@@ -425,6 +314,9 @@ def serveSim2():
                             "Średnica spadochronu [m]:",
                             dcc.Input(type='number', id='simulation2-diameter-input', min=0, step=.01, value=0.30),
                             serveTooltip(DESCRIPTION_SIM2_PARAMS['diameter'], 'simulation2-diameter-input'),
+                            "Średnica otworu centralnego [m]:",
+                            dcc.Input(type='number', id='simulation2-holediameter-input', min=0, step=.01, value=0.0),
+                            serveTooltip(DESCRIPTION_SIM2_PARAMS['holediameter'], 'simulation2-holediameter-input'),
                         ], style={
                             "display": "grid",
                             "grid-template-columns": "1fr 75px",
@@ -445,24 +337,12 @@ def serveSim2():
                         dbc.Button(
                             "Przelicz",
                             id="simulation2-run-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                         dbc.Button(
-                            "💾 Zapisz",
+                            "💾 Zapisz CSV",
                             id="simulation2-save-button",
-                            style = {
-                                'width': '100%',
-                                'margin': '5px',
-                                'background-color': BASE_COLOR,
-                                'color': 'white',
-                                'border-color': BASE_COLOR
-                            }
+                            class_name='button'
                         ),
                     ],
                     className='buttons-container'
@@ -487,3 +367,178 @@ def serveSim2():
             ],
             className='sim-container'
         )
+
+def serveShapeGenerator():
+    return html.Div(
+            [                
+                html.H2(
+                    "IV Generator kształtu czaszy spadochronu",
+                    style = {
+                        'grid-row': '1',
+                        'grid-column': '1/-1',
+                    },
+                    className='h2-box'
+                ),
+                dbc.Card([
+                    dbc.CardBody([
+                        html.Div(
+                            GENERATOR_DESCRIPTION,
+                            id = "shapegenerator-description-container",                    
+                        )
+                    ], className='card-info'),
+                ], style={
+                    'grid-row': '2',
+                    'grid-column': '1/-1',
+                    'height': '100%'
+                }, className='card-info'),
+                dbc.Card([
+                    dbc.CardHeader(
+                        html.H3("Parametry wejściowe"),
+                    ), 
+                    dbc.CardBody([
+                        html.Div(
+                        [
+                            "Efektywna średnica spadochronu [m]:",
+                            dcc.Input(type='number', id='shapegenerator-diameter-input', min=0, step=.01, value=0.30),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['diameter'], 'shapegenerator-diameter-input'),
+                            "Liczba segmentów [-]:",
+                            dcc.Input(type='number', id='shapegenerator-segments-input', min=5, step=1, value=8),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['segments'], 'shapegenerator-segments-input'),
+                            "Współczynnik sferyczności [%]:",
+                            dcc.Input(type='number', id='shapegenerator-spherepercent-input', min=5, max=95, step=1, value=50),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['spherepercent'], 'shapegenerator-spherepercent-input'),
+                            "Kąt rozwarcia stożka [deg]:",
+                            dcc.Input(type='number', id='shapegenerator-coneangle-input', min=1, max=179, step=1, value=135),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['coneangle'], 'shapegenerator-coneangle-input'),
+                            "Średnica centralnego otworu [m]:",
+                            dcc.Input(type='number', id='shapegenerator-holediameter-input', min=0, step=.01, value=0),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['holediameter'], 'shapegenerator-holediameter-input'),
+                            "Liczba punktów [-]:",
+                            dcc.Input(type='number', id='shapegenerator-points-input', min=2, max=250, step=1, value=15),
+                            serveTooltip(DESCRIPTION_GENERATOR_PARAMS['points'], 'shapegenerator-points-input'),
+                        ], style={
+                            "display": "grid",
+                            "grid-template-columns": "1fr 75px",
+                            "width": "100%",
+                            "gap": "5px",
+                            "text-align": "right",
+                            "padding": "5px"
+                        }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '3',
+                    'grid-column': '1',
+                    'height': '100%'
+                }),
+                html.Div(
+                    [
+                        dbc.Button(
+                            "Przelicz",
+                            id="shapegenerator-run-button",
+                            class_name='button'
+                        ),
+                        dbc.Button(
+                            "💾 Zapisz DXF",
+                            id="shapegenerator-save-button",
+                            class_name='button'
+                        ),
+                    ],
+                    className='buttons-container'
+                ),
+                dbc.Card([
+                    dbc.CardHeader(html.H3("Wyniki - 2D")), 
+                    dbc.CardBody([
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    id = 'shapegenerator-results-plot',
+                                    figure = getEmptyPlot(),
+                                    config = {
+                                        'responsive': False,
+                                        'displayModeBar': True,
+                                        'toImageButtonOptions': {
+                                            'format': 'png',
+                                            'filename': 'parasim_plot',
+                                            },
+                                    },
+                                    style={"width": "100%", "height": "100%"},
+                                ),
+                            ], style={
+                                "width": "100%",
+                                "height": "100%",
+                                "padding" : "5px"
+                            }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '3/5',
+                    'grid-column': '2',
+                    'height': '100%'
+                }),
+                dbc.Card([
+                    dbc.CardHeader(html.H3("Wyniki - 3D")), 
+                    dbc.CardBody([
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    id = 'shapegenerator-results2-plot',
+                                    figure = getEmptyPlot(),
+                                    config = {
+                                        'responsive': False,
+                                        'displayModeBar': True,
+                                        'toImageButtonOptions': {
+                                            'format': 'png',
+                                            'filename': 'parasim_plot',
+                                            },
+                                    },
+                                    style={"width": "100%", "height": "100%"},
+                                ),
+                            ], style={
+                                "width": "100%",
+                                "height": "100%",
+                                "padding" : "5px"
+                            }
+                        )
+                    ]),
+                ], style={
+                    'grid-row': '3/5',
+                    'grid-column': '3',
+                    'height': '100%'
+                }),
+                dbc.Card([
+                    dbc.CardBody(
+                    [],
+                    className='card-info',
+                    id = "shapegenerator-alert-container",
+                    ),
+                ], style={
+                    'grid-row': '5',
+                    'grid-column': '1/-1',
+                    'height': '100%'
+                }, className='card-alert'),
+            ],
+            className='shape-container'
+        )
+
+def serveModalDragCoeffInfo():
+    modal = dbc.Modal([
+        dbc.ModalHeader(html.H2("Współczynnik oporu aerodynamicznego")),
+        dbc.ModalBody([
+            html.Div(
+                [
+                    html.H3("Kształt spadochronu"),
+                    html.H3("Współczynnik"),
+                ] + [val for row in [(html.B(PARACHUTE_TYPE_LABELS[key]), val) for key,val in COEFF_INFO.items()] for val in row],
+                style={
+                    "display": "grid",
+                    "grid-template-columns": "1fr auto",
+                    "width": "100%",
+                    "gap": "10px",
+                    "text-align": "right",
+                    "padding": "5px"
+                }
+            )
+        ]),
+    ], id='modal-dragcoeffinfo', is_open=False)
+    return modal

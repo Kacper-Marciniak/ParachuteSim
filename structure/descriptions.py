@@ -1,6 +1,16 @@
-INPUT_DESCRIPTION =  "Sprecyzuj parametry fizyczne oraz środowiskowe dla symulacji. Gęstość powietrza może być zadana bezpośrednio lub wyznaczona wykorzystując parametry środowiskowe misji wpisane do pierwszej kolumny.",
-SIM1_DESCRIPTION = "Wyznacz średnicę czaszy spadochronu wymaganą do osiągnięcia docelowej prędkości opadania. Wartości MIN oraz MAX sterują zakresem prędkości, dla których wykonywane są obliczenia. Wyznaczona średnica spadochronu zostanie użyta w następnej sekcji.",
-SIM2_DESCRIPTION = "Wyznacz obciążenia występujące podczas otwarcia czaszy spadochronu o danej średnicy przy zadanej prędkości opadania. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w poprzedniej sekcji.",
+PARACHUTE_TYPE_LABELS = {
+    "spherical": "Sferyczny",
+    "flat_disk": "Płaski dysk",
+    "conical": "Stożkowy",
+    "annular": "Pierścieniowy",
+    "cross": "Krzyżowy",
+    "other": "Inny",
+}
+
+INPUT_DESCRIPTION =  "ℹ️ Sprecyzuj parametry fizyczne oraz środowiskowe dla symulacji. Gęstość powietrza może być zadana bezpośrednio lub wyznaczona wykorzystując parametry środowiskowe misji wpisane do pierwszej kolumny.",
+SIM1_DESCRIPTION = "ℹ️ Wyznacz średnicę czaszy spadochronu wymaganą do osiągnięcia docelowej prędkości opadania. Wartości MIN oraz MAX sterują zakresem prędkości, dla których wykonywane są obliczenia. Wyznaczona średnica spadochronu zostanie użyta w kolejnych sekcjach.",
+SIM2_DESCRIPTION = "ℹ️ Wyznacz obciążenia występujące podczas otwarcia czaszy spadochronu o danej średnicy przy zadanej prędkości opadania. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
+GENERATOR_DESCRIPTION = "ℹ️ Wyznacz kształt segmentów czaszy spadochronu. Średnica spadochronu może być zdefiniowana bezpośrednio lub wyznaczona w sekcji \"ŚREDNICA CZASZY SPADOCHRONU\".",
 INPUT_PARAMETERS_DESCRIPTION = """PARAMETRY GŁÓWNE
 
 Gęstość powietrza - wartość w kg/m^3 na wysokości otwarcia spadochronu. Do wpisania bezpośrednio lub wyznaczana przy użyciu dodatkowego modułu.
@@ -26,6 +36,8 @@ DESCRIPTION_INPUT_PARAMS = {
     "airdensity": "Gęstość powietrza na wysokości otwarcia spadochronu",
     "gaccel": "Przyśpieszenie ziemskie mierzone na platformie startowej",
     "dragcoeff": "Współczynnik oporu aerodynamicznego zależny od kształtu spadochronu",
+    "draginteg": "Znormalizowana wartość pola pod wykresem siły oporu aerodynamicznego w funkcji czasu (w chwili czasowej otwarcia spadochronu)",
+    "canopytype": "Typ czaszy spadochronu. Domyślnie: sferyczny",
 }
 
 DESCRIPTION_SIM1_PARAMS = {
@@ -33,11 +45,23 @@ DESCRIPTION_SIM1_PARAMS = {
     "velocitystart": "Początek zakresu rozpatrywanych prędkości opadania",
     "velocitystop": "Koniec zakresu rozpatrywanych prędkości opadania",
     "velocity": "Oczekiwana prędkość opadania pojazdu po otwarciu spadochronu",
-    "diameter": "Wyznaczona średnica czaszy spadochronu"
+    "diameter": "Wyznaczona średnica czaszy spadochronu",
+    "holediameter": "Wyznaczona średnica otworu centralnego",
+    "holefactor": "Wielkość otworu centralnego jako ułamek średnicy czaszy spadochronu",
 }
 
 DESCRIPTION_SIM2_PARAMS = {
     "mass" : "Rzeczywista masa pojazdu",
     "velocity": "Prędkość opadania przed otwarciem spadochronu",
-    "diameter": "Średnica czaszy spadochronu"
+    "diameter": "Średnica czaszy spadochronu",
+    "holediameter": "Średnica otworu centralnego",
+}
+
+DESCRIPTION_GENERATOR_PARAMS = {
+    "diameter": "Efektywna średnica czaszy spadochronu",
+    "segments": "Liczba segmentów czaszy spadochronu",
+    "spherepercent": r"Współczynnik sferyczności czaszy spadochronu, gdzie 50% to spadochron półsferyczny",
+    "holediameter": "Średnica otworu centralnego w czaszy spadochronu",
+    "points": "Liczba punktów użytych podczas wyznaczania kształtu czaszy spadochronu. Więcej punktów oznacza dokładniejsze odwzorowanie kształtu",
+    "coneangle": "Kąt rozwarcia stożka czaszy spadochronu (tylko dla czaszy stożkowych).",
 }

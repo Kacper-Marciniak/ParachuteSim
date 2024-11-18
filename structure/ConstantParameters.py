@@ -1,0 +1,3 @@
+APP_VERSION = '1.3'
+APP_YEAR = '2024'
+BASE_COLOR = '#008ede'
